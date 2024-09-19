@@ -1,0 +1,22 @@
+.card-historial {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.65rem;
+    border: 1px rgb(190, 190, 190) solid;
+    border-radius: 0.6rem;
+    background-color: rgb(249, 249, 249);
+}
+
+.card-historial .icon-historial {
+    color: #598fb9;
+}
+
+.card-historial h6 {
+    color: gray;
+}
+
+.card-historial span {
+    font-size: 0.75;
+    font-weight: bold;
+    color: #007ad9ab
+}

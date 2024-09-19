@@ -1,0 +1,40 @@
+<div class="">
+    <div class="container">
+        <div class="card card-container">
+            <!-- <img class="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" /> -->
+            <h4 class="text-center text-info">Login Inventory</h4>
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin" [formGroup]="forma" (ngSubmit)="IngresarSistema()">
+                <span id="reauth-email" class="reauth-email"></span>
+                <div class="input-group">
+                    <input type="text" class="form-control" [ngClass]="{
+                        'is-invalid': !forma.get('strUsuario').valid && !forma.get('strUsuario').pristine,
+                        'is-valid': forma.get('strUsuario').valid}" placeholder="Usuario" autocomplete="username" formControlName="strUsuario" autofocus />
+                    <div class="invalid-feedback">Ingrese usuario</div>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="form-control" [ngClass]="{
+                        'is-invalid': !forma.get('strPassword').valid && !forma.get('strPassword').pristine,
+                        'is-valid': forma.get('strPassword').valid
+                        }" placeholder="Contraseña" autocomplete="current-password" formControlName="strPassword" />
+                    <div class="invalid-feedback">Ingrese Contraseña</div>
+                </div>
+                <div id="remember" class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"/> Remember me
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block btn-signin text-uppercase" [disabled]="!forma.valid" type="submit">
+                    Ingresar
+                </button>
+            </form>
+            <!-- /form -->
+            <a href="#" class="forgot-password">
+                Forgot the password?
+            </a>
+        </div>
+        <!-- /card-container -->
+    </div>
+    <!-- /container -->
+</div>

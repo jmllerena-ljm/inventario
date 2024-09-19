@@ -1,0 +1,135 @@
+<div class="animated fadeIn">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col">
+                    Administración de Roles
+                </div>
+                <div class="col text-right">
+                    <button class="btn btn-primary btn-sm" (click)="handleAdd()">
+                      <i class="fa fa-plus-circle"></i> Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive-sm">
+                <table class="table table-bordered table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">Descripción</th>
+                            <th class="text-center" scope="col">Usuario Modifica</th>
+                            <th class="text-center" scope="col">Fecha Modifica</th>
+                            <th class="text-center" scope="col">Operaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of gridData; let i = index" class="clickable-row">
+                            <td class="text-center" scope="row">{{(i+1)}}</td>
+                            <td>{{ item.strDescripcion }}</td>
+                            <td class="text-center">{{ item.strUsuarioModif }}</td>
+                            <td class="text-center">{{ item.dtmFechaModif | date:'dd/MM/yyyy' }}</td>
+                            <td class="text-center">
+                                <button style="padding: 0px 4px;margin-right: 2px" class="btn btn-outline-success" (click)="handleEdit(item)">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button style="padding: 0px 6px" class="btn btn-outline-danger" (click)="handleDelete(item)">
+                                    <i class="fa fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR ROL -->
+<p-dialog [(visible)]="displayAddRol" [contentStyle]="{'max-width':'600px', 'min-width': '500px'}" modal="true" positionTop="75">
+    <p-header>
+        Agregar Rol
+    </p-header>
+    <div style="padding:5px">
+        <form [formGroup]="formAdd">
+            <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label col-form-label-sm">Descripción</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control form-control-sm" formControlName="strDescripcion" placeholder="Nombre">
+                </div>
+            </div>
+            <div>
+                <div class="row">
+                    <div class="col">
+                        <p><b>Accesos</b></p>
+                        <p-tree [value]="filesTreeAdd" selectionMode="checkbox" [(selection)]="selectedAdd"></p-tree>
+                    </div>
+                    <div class="col">
+                        <!-- <div>Selected Nodes: <span *ngFor="let file of selectedAdd">{{file.data}} </span></div> -->
+                        <p><b>Accesos del Rol</b></p>
+                        <ul>
+                            <li *ngFor="let file of selectedAdd">
+                                {{ file.label }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <p-footer>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayAddRol=false">Cancelar</button>
+        <button type="button" [disabled]="!formAdd.valid" class="btn btn-primary btn-sm" (click)="addRol()"><i class="fa fa-save"></i> Guardar</button>
+    </p-footer>
+</p-dialog>
+
+<!-- EDITAR ROL -->
+<p-dialog [(visible)]="displayEditRol" [contentStyle]="{'max-width':'600px', 'min-width': '500px'}" modal="true" positionTop="75">
+    <p-header>
+        Editar Rol
+    </p-header>
+    <div style="padding:5px">
+        <form [formGroup]="formEdit">
+            <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label col-form-label-sm">Descripción</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control form-control-sm" formControlName="strDescripcion" placeholder="Nombre">
+                </div>
+            </div>
+            <div>
+                <!-- <p-tree [value]="filesTreeAdd" selectionMode="checkbox" [(selection)]="selectedEdit"></p-tree> -->
+                <!-- <div class="ui-g-12" *ngFor="let item of filesTreeAdd[0].children">
+                        <p-checkbox name="group2" [value]="item.data" [label]="item.label" ([model])="selectedAccessEdit" [inputId]="item.data"></p-checkbox>
+                    </div> -->
+                <div class="table-responsive-sm">
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 25px">Acceso</th>
+                                <th>Descripcion</th>
+                                <th>Nivel de Acceso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of DataAccesos">
+                                <td class="text-center">
+                                    <input type="checkbox" [value]="item.status" (change)="(item.status = (item.status==true)?false:true)" [checked]="item.status">
+                                    <!-- <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" checked>
+                                    </div> -->
+                                </td>
+                                <td>{{ item.strDescripcion }}</td>
+                                <td>{{ item.strNivelAcceso }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+    <p-footer>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayEditRol=false">Cancelar</button>
+        <button type="button" [disabled]="!formEdit.valid" class="btn btn-primary btn-sm" (click)="editRol()"><i class="fa fa-save"></i> Guardar</button>
+    </p-footer>
+</p-dialog>

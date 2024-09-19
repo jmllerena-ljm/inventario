@@ -1,0 +1,112 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">PROVEEDORES
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleAdd()">Crear</button>
+                        </h4>
+                        <p class="card-category">Registro de Proveedores</p>
+                    </div>
+                    <div class="col">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchProveedores()">
+                            <div class="input-group no-border">
+                                <input type="search" formControlName="number" class="form-control colorPlaceholder mx-2" placeholder="Ruc...">
+                                <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Razon Social...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th scope="col">Código</th>
+                            <th scope="col">Ruc</th>
+                            <th scope="col">Razon Social</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Telefono</th>
+                            <th scope="col">Tipo</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" (click)="handleEdit(item)" class="clickable-row pointerHand">
+                                <td>{{item.code}}</td>
+                                <td>{{ item.docNumber }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>{{ item.phone }}</td>
+                                <td>{{ item.type }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR PROVEEDOR -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Crear - Proveedor
+    </p-header>
+    <form [formGroup]="formAdd" style="margin-bottom:0px" (ngSubmit)="saveProveedor()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-clipboard-list fa-7x"></i>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="RUC" formControlName="docNumber">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Razon Social" formControlName="name">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formAdd.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR PROVEEDOR -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Proveedor
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateProveedor()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-clipboard-list fa-7x"></i>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="RUC" formControlName="docNumber">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Razon Social" formControlName="name">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>

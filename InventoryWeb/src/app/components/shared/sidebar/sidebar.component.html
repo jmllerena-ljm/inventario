@@ -1,0 +1,29 @@
+<div class="logo">
+    <a [routerLink]="['dashboard']" class="simple-text">
+        <div class="logo-img">
+            <img src="assets/img/feature_icon_mrp.png" />
+        </div>
+        <span style="color: #00bcd4;font-weight:bold;">MRP</span>
+    </a>
+    <div style="border: 1px solid gray;border-radius: 5px;margin:5px">
+        <div class="row justify-content-md-center" style="padding: 0px 5px;">
+            <div class="col-md-2 my-auto">
+                <i style="color:#dddddd;" class="fa fa-user-circle fa-2x"></i>
+            </div>
+            <div class="col-md-10 text-truncate">
+                <span class="" style="color:#d4d4d4;font-size: 0.9rem;">{{ identity.strUsuario | uppercase }}</span><br>
+                <span class="pointerHand" style="color:rgb(49, 113, 233);font-size: 0.8rem;" (click)="logout()"><u>Cerrar Sesión <i class="fa fa-sign-out-alt"></i></u></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="sidebar-wrapper">
+    <ul class="nav mb-5">
+        <li routerLinkActive="active" *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
+            <a class="nav-link" [routerLink]="[menuItem.path]">
+                <i [class]="menuItem.icon"></i>
+                <p>{{menuItem.title}}</p>
+            </a>
+        </li>
+    </ul>
+</div>

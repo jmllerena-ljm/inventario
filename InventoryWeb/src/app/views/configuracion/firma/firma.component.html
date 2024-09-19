@@ -1,0 +1,135 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">Firmas
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleAdd()">Crear</button>
+                        </h4>
+                        <p class="card-category">Configuración de Firmas - Recibos de Egresos</p>
+                    </div>
+                    <div class="col">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchFirmas()">
+                            <div class="input-group no-border">
+                                <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Nombre...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.75rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Tipo</th>
+                            <th class="text-center" scope="col">Estado</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="handleEdit(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td><b>{{ item.code }}</b></td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.type }}</td>
+                                <td class="text-center"><i class="fa" [ngClass]="{'fa-check-circle text-success': item.status, 'fa-times-circle text-danger':!item.status}"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR FIRMA -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Crear - Firma
+    </p-header>
+    <form [formGroup]="formAdd" style="margin-bottom:0px" (ngSubmit)="saveFirma()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-signature fa-7x"></i>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Codigo" formControlName="code">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Nombre" formControlName="name">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <mat-label>Tipo</mat-label>
+                        <select matNativeControl formControlName="type">
+                            <option [value]="item.value" *ngFor="let item of dataTipos;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <p>
+                <label for="" class="text-muted" style="font-size: 0.7rem;">Subir Firma en formato PNG (Tamaño recomendado 964 x 482)</label>
+                <input #fileInputAdd class="btn btn-success btn-sm btn-block" type="file" accept=".png" placeholder="Seleccionar archivo..." (change)="fileChangeEvent($event)">
+            </p>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formAdd.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR FIRMA -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Firma
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateFirma()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <div class="image">
+                        <img id="image_product" src="{{url + 'firma/get-image/'+ itemEdit.image}}" class="img-fluid" alt="">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <mat-checkbox formControlName="status">Activo?</mat-checkbox>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Codigo" formControlName="code">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Nombre" formControlName="name">
+                    </mat-form-field>
+                    <!-- <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Tipo" formControlName="type">
+                    </mat-form-field> -->
+                    <mat-form-field class="mx-2">
+                        <mat-label>Tipo</mat-label>
+                        <select matNativeControl formControlName="type">
+                            <option [value]="item.value" *ngFor="let item of dataTipos;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <p>
+                <label for="" class="text-muted" style="font-size: 0.7rem;">Cambiar Firma - Subir Firma en formato PNG (Tamaño recomendado 964 x 482)</label>
+                <input #fileInputEdit [disabled]="formEdit.disabled" class="btn btn-success btn-sm btn-block" type="file" placeholder="Seleccionar archivo..." (change)="fileChangeEvent($event)">
+            </p>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>

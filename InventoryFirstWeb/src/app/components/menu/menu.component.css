@@ -1,0 +1,9 @@
+/* body {
+    padding-bottom: 30px;
+}*/
+
+.main-container {
+    margin-top: 10px;
+    overflow-y: auto;
+    height: 100%;
+}

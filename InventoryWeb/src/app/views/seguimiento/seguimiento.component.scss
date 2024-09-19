@@ -1,0 +1,59 @@
+input[type='text'] {
+    width: 100%;
+}
+
+.nav-tabs .nav-item .nav-link {
+    padding: 5px 15px !important;
+}
+
+.nav-tabs {
+    padding: 3px 15px;
+}
+
+.flecha {
+    font-size: 0.8rem;
+    // font-weight: bold;
+    color: #052e4c;
+    margin: 0.3rem 0.85rem;
+    padding: 0.45rem 1rem;
+    background-color: #a5e8a5;
+    border: #3a9823 1px solid;
+    -webkit-border-radius: 0px 16px 16px 0px;
+}
+
+.note.blue {
+    background: none repeat scroll 0 0 #53A3B4;
+    /* color de fondo */
+    color: #FFFFFF;
+    /* color de texto */
+    margin: 2em auto;
+    overflow: hidden;
+    padding: 1em 1.5em;
+    position: relative;
+    width: 480px;
+    /* ancho */
+}
+
+.note.blue:before {
+    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), -1px 1px 1px rgba(0, 0, 0, 0.2);
+    background: none repeat scroll 0 0 #658E15;
+    /* color de fondo */
+    border-color: #FFFFFF #FFFFFF #658E15 #658E15;
+    /* color de esquina */
+    border-style: solid;
+    border-width: 0 16px 16px 0;
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 0;
+}
+
+.simplecard {
+    // border: rgb(90, 150, 158) 2px solid;
+    // background: #eaf5f5;
+    border-radius: 5px;
+    padding: 0.4rem;
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -1px rgba(0, 188, 212, 0.4)
+}

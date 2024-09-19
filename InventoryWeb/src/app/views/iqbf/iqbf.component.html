@@ -1,0 +1,197 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 class="card-title">IQBF</h4>
+                        <p class="card-category">Insumos Químico y Bienes Fiscalizados por Sunat</p>
+                    </div>
+                    <div class="col-md-9 text-right">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchAlmacenIQBF()">
+                            <div class="row" style="margin-right: 0.5rem;">
+                                <div class="col-md-12 text-right">
+                                    Compañia:&nbsp;
+                                    <select formControlName="company" (change)="searchAlmacenIQBF()">
+                                        <option [value]="item._id" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group no-border">
+                                    <input type="search" formControlName="code" class="form-control colorPlaceholder mx-2" placeholder="Codigo...">
+                                    <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Nombre...">
+                                    <input type="search" formControlName="group" class="form-control colorPlaceholder mx-2" placeholder="Tipo...">
+                                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="padding: 0.5rem 1rem;margin-bottom: 0.5rem;background-color: aquamarine;border-radius: 1rem;">
+                    <div class="row">
+                        <div *ngIf="idEditPeriodo != -1" class="col-md-10 my-auto">
+                            Dias hasta restablecer Cantidad autorizada Sunat <span class="text-muted">({{dataPeriodo.dateFin | date:'dd/MM/yyyy'}})</span>:&nbsp;
+                            <span style="color:#3e3e86;font-weight: bold;">{{daysToReset }}&nbsp;dias</span>
+                        </div>
+                        <div *ngIf="idEditPeriodo == -1" class="col-md-10 my-auto">
+                            <span class="text-muted">Sin Periodo de fiscalizacion, Edite o Registre un nuevo Periodo</span>
+                        </div>
+                        <div class="col-md-2 text-right" *ngIf="accessLevel.NivelAcceso">
+                            <button mat-raised-button (click)="handlEditPeriodo()" type="button" matTooltip="Editar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-round btn-sm btn-link btn-just-icon">
+                                <i class="fa fa-edit"></i>
+                                <div class="ripple-container"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <!-- <th class="text-center" scope="col">#</th> -->
+                            <th class="text-center" scope="col">Codigo</th>
+                            <th scope="col">Nombre</th>
+                            <th class="text-center" scope="col">Und</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th class="text-center" scope="col">Entradas</th>
+                            <th class="text-center" scope="col">Salidas</th>
+                            <th class="text-center" scope="col">Cant.Restante</th>
+                            <th class="text-center" scope="col">Cons./d Actual</th>
+                            <th class="text-center" scope="col">Estim. Cons./d</th>
+                            <th scope="col" *ngIf="accessLevel.NivelAcceso">Editar</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand">
+                                <!-- <td class="text-center" scope="row">{{(i+1)}}</td> -->
+                                <td class="text-center" style="width: 9rem;">{{ item.code }}</td>
+                                <td>{{ item.name }}</td>
+                                <td class="text-center">{{ item.umed | uppercase }}</td>
+                                <td>{{ item.group }}</td>
+                                <td class="text-right">{{ item.entry | number:'.2-2' }}</td>
+                                <td class="text-right">{{ item.output | number:'.2-2' }}</td>
+                                <td class="text-right">
+                                    <span style="font-weight:bold;color:#3e3e86">{{ item.authorized_amount | number:'.2-2' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span style="font-weight:bold;">{{ (pastDays > 0 ? item.output / pastDays : 0) | number:'.2-2' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span style="font-weight:bold;color:#c44c44">{{ (daysToReset > 0 ? item.authorized_amount / daysToReset : 0) | number:'.2-2' }}</span>
+                                </td>
+                                <td *ngIf="accessLevel.NivelAcceso" class="td-actions text-right" style="width: 4em">
+                                    <button mat-raised-button type="button" matTooltip="Editar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-success btn-round btn-sm btn-link btn-just-icon" (click)="handleEdit(item)">
+                                        <i class="fa fa-edit"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success btn-sm" (click)="exportAsXLSX()">
+                            <i class="fas fa-cloud-download-alt"></i> 
+                            Exportar Excel
+                        </button>
+                    </div>
+                    <!-- <div class="col">
+                        Total: {{ gridData.length }}
+                    </div> -->
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDITAR ALMACEN IQBF -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Producto [{{ itemEdit.code }}]
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateAlmacen()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" readonly placeholder="Codigo" [value]="itemEdit.code">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" readonly placeholder="Nombre del Producto" [value]="itemEdit.name">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" readonly placeholder="Unidad de Medida" [value]="itemEdit.umed">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" readonly placeholder="Grupo / Tipo Producto" [value]="itemEdit.group">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-clipboard-list fa-7x"></i>
+                </div>
+                <div class="col-md-8">
+                    <div style="padding-left: 0.5rem">
+                        <!-- <mat-checkbox disabled [checked]="itemEdit.audited">Fiscalizado ?</mat-checkbox> -->
+                        <mat-checkbox formControlName="audited">Fiscalizado ?</mat-checkbox>
+                    </div>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Cantidad Autorizada Restante" formControlName="authorized_amount">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR PERIODO IQBF -->
+<p-dialog [(visible)]="displayEditPeriodo" positionTop="50" modal="true">
+    <p-header>
+        Editar - Periodo
+    </p-header>
+    <form [formGroup]="formEditPeriodo" style="margin-bottom:0px" (ngSubmit)="handleSave()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha Inicio" formControlName="dateIni">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-12">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha Fin" formControlName="dateFin">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEditPeriodo">Cancelar</button>
+            <button [disabled]="!formEditPeriodo.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>

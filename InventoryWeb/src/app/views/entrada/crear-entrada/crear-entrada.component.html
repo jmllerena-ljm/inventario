@@ -1,0 +1,194 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">Suministros</h4>
+                        <p class="card-category">Nueva Entrada</p>
+                    </div>
+                    <div class="col text-right">
+                        <button mat-raised-button matTooltip="Regresar" [matTooltipPosition]="'below'" matTooltipShowDelay="500" class="btn btn-danger btn-sm btn-round btn-just-icon" [routerLink]="['menu','entrada']">
+                            <i class="fa fa-arrow-left"></i>
+                            <div class="ripple-container"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <div class="alert alert-secondary" style="background:rgba(0, 0, 0, 0.14)" role="alert">
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Buscar en Odoo 
+                                <button mat-raised-button matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="500" class="btn btn-primary btn-sm btn-round btn-just-icon"
+                                    (click)="handleSearch()">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </label>
+                        </div>
+                        <div class="col text-right">
+                            <button class="btn btn-primary btn-sm" (click)="handleSave()">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card" *ngFor="let itemColl of ListaEntradas;let i = index">
+                        <div class="card-header">
+                            <b style="color:#3e4169">{{ (i+1) +' - '+ itemColl.name }}</b>
+                        </div>
+                        <div class="card-body">
+                            <!--TARGET-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Doc.Almacen" readonly [value]="itemColl.name">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Fecha" readonly [value]="itemColl.date">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Tipo" readonly [value]="itemColl.type">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <hr>
+                            <label for="">Proveedor</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Razon Social" readonly [value]="itemColl.supplier.name">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field>
+                                        <input matInput placeholder="RUC" readonly [value]="itemColl.supplier.type_number">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <table class="table table-hover">
+                                <thead class="text-info">
+                                    <th class="text-center" scope="col">#</th>
+                                    <th scope="col">Código</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Precio Unit.</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of itemColl.detalle; let i = index" class="clickable-row">
+                                        <td class="text-center" scope="row">{{(i+1)}}</td>
+                                        <td>{{ item.code }}</td>
+                                        <td>{{ item.name }}</td>
+                                        <td class="text-right">{{ item.product_qty | number:'.2-3' }}</td>
+                                        <td class="text-right">{{ item.price_unit | number:'.2-2' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BUSCAR ENTRADA EN ODOO -->
+<p-dialog [(visible)]="displaySearchOdoo" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Buscar entrada / salida de suministros - Odoo
+    </p-header>
+    <div style="padding:5px">
+        <div class="alert alert-secondary" style="background:rgba(0, 0, 0, 0.14);margin-bottom: 0px;" role="alert">
+            <div class="row">
+                <div class="col">
+                    <form class="form-signin" [formGroup]="formSearchOdoo" style="margin-bottom:0px" (ngSubmit)="searchStockPicking()">
+                        <div class="input-group no-border">
+                            <mat-form-field class="mx-2">
+                                <input matInput placeholder="Doc.Almacen" formControlName="name">
+                            </mat-form-field>
+                            <mat-form-field class="mx-2">
+                                <input matInput type="date" placeholder="Fecha Inicio" formControlName="date_ini">
+                            </mat-form-field>
+                            <mat-form-field class="mx-2">
+                                <input matInput type="date" placeholder="Fecha Fin" formControlName="date_fin">
+                            </mat-form-field>
+                            <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                              <i class="fa fa-search"></i>
+                              <div class="ripple-container"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tableFixHead" style="max-height: 300px;">
+            <table class="table table-hover" style="font-size:0.78rem">
+                <thead class="text-info">
+                    <th scope="col" class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value=""
+                                    (change)= "changeCheckGeneral()"
+                                    [(ngModel)]="checkGeneral"
+                                    [checked]="checkGeneral">
+                                <span class="form-check-sign">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </th>
+                    <th class="text-center" scope="col">#</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Doc. Almacen</th>
+                    <th scope="col">Estado</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of SuministrosOdoo; let i = index" class="clickable-row pointerHand">
+                        <!-- (click)="SelectItem(item)"> -->
+                        <td class="text-center">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        [(ngModel)]="item.reception_to_invoice"
+                                        [checked]="item.reception_to_invoice">
+                                    <span class="form-check-sign">
+                                        <span class="check"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </td>
+                        <td class="text-center" scope="row">{{(i+1)}}</td>
+                        <td>{{ item.date }}</td>
+                        <td class="text-center">{{ item.name }}</td>
+                        <td class="text-center">
+                            <span class="badge badge-primary text-wrap">{{ item.state }}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p-footer>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displaySearchOdoo=false">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="CargarEntradasSelected()"><i class="fa fa-cloud-upload-alt"></i> Cargar</button>
+    </p-footer>
+</p-dialog>
+
+<!-- MESSAGE SAVE -->
+<p-dialog [(visible)]="displayMessageSave" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        {{ messageSave.title }}
+    </p-header>
+    <div style="padding:5px">
+        <span>{{ messageSave.message }}</span>
+    </div>
+    <p-footer>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayMessageSave=false">Cerrar</button>
+        <!-- <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-cloud-upload-alt"></i> Cargar</button> -->
+    </p-footer>
+</p-dialog>

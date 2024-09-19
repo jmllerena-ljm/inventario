@@ -1,0 +1,39 @@
+<div style="padding:5px">
+    <div>
+        <table class="table table-hover" style="font-size:0.68rem">
+            <thead class="text-info">
+                <th class="text-center" scope="col">#</th>
+                <th scope="col">Fecha</th>
+                <th scope="col" class="text-center">Tipo</th>
+                <th scope="col">Código</th>
+                <th scope="col" class="text-center">Producto</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Precio Unit.</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of detalleProducto; let i = index" class="clickable-row">
+                    <td class="text-center" scope="row">{{(i+1)}}</td>
+                    <td>{{ item.date | date: 'dd-MM-yyyy' }}</td>
+                    <td>
+                        <span style="font-size:0.7rem" class="badge text-wrap" [ngClass]="{'badge-primary': (item.entrada.type!='IN'), 'badge-success': (item.entrada.type=='IN')}">
+                            {{ (item.entrada.type=='IN')? 'Entrada':'Salida' }}
+                        </span>
+                    </td>
+                    <td>{{ item.code }}</td>
+                    <td>{{ item.name }}</td>
+                    <td class="text-right">{{ item.product_qty | number:'.2-3' }}</td>
+                    <td class="text-right">{{ item.price_unit | number:'.2-2' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row" style="height:30px;line-height:30px;background-color:rgb(201, 200, 200)">
+        <div class="col text-left font-weight-bold">
+            Total
+        </div>
+        <div class="col text-right">
+            <span>Entradas: <b>{{ SumData(detalleProducto, 'IN') | number:'.2-2' }}</b></span>
+            <span style="padding-left:3rem">Salidas: <b>{{ SumData(detalleProducto, 'OUT') | number:'.2-2' }}</b></span>
+        </div>
+    </div>
+</div>

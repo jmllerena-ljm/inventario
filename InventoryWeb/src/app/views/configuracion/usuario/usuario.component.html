@@ -1,0 +1,216 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">Usuarios
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleAdd()">Crear</button>
+                        </h4>
+                        <p class="card-category">Configuración de Usuarios</p>
+                    </div>
+                    <div class="col">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchUsers()">
+                            <div class="input-group no-border">
+                                <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Nombre...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">Nombres</th>
+                            <th scope="col">Apellidos</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Cargo</th>
+                            <th class="text-center" scope="col">Estado</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="handleEdit(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td>{{ item.strNombre }}</td>
+                                <td>{{ item.strApellidos }}</td>
+                                <td>{{ item.strEmail }}</td>
+                                <td>{{ item.rol }}</td>
+                                <td class="text-center">
+                                    <i *ngIf="item.status" class="fa fa-check-circle text-success"></i>
+                                    <i *ngIf="!item.status" class="fa fa-times-circle text-danger"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR USUARIO -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Nuevo - Usuario
+    </p-header>
+    <form [formGroup]="formAdd" style="margin-bottom:0px" (ngSubmit)="saveUser()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-2 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-user-plus fa-3x"></i>
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Nombres" formControlName="strNombre">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Apellidos" formControlName="strApellidos">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="email" placeholder="Correo (Usuario)" formControlName="strEmail">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="password" placeholder="Contraseña" formControlName="strPassword">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Cargo" formControlName="rol">
+                            </mat-form-field>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div>
+                <table class="table table-bordered" style="font-size: 0.75rem;">
+                    <thead>
+                        <tr>
+                            <th style="font-size: 0.8rem !important;" class="text-center w-1">Acceso</th>
+                            <th style="font-size: 0.8rem !important;" class="w-65">Descripcion</th>
+                            <th style="font-size: 0.8rem !important;" class="text-center w-15">Nivel de Acceso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of DataAccess">
+                            <td class="text-center">
+                                <input type="checkbox" [value]="item.check" (change)="(item.check = (item.check==true)?false:true)" [checked]="item.check">
+                            </td>
+                            <td>{{ item.description }}</td>
+                            <td class="text-center">
+                                <label class="switch switch-label switch-outline-primary-alt">
+                                    <input type="checkbox"  class="switch-input" (change)="(item.accessLevel = (item.accessLevel==true)?false:true)" [checked]="item.accessLevel">
+                                    <!-- <span class="switch-slider" data-checked="Write" data-unchecked="Read"></span> -->
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formAdd.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR USUARIO -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Usuario
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateUser()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-2 d-flex justify-content-center align-items-center">
+                    <!-- <input type="checkbox" formControlName="status"> -->
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <mat-checkbox formControlName="status">Activo ?</mat-checkbox>
+                        </div>
+                        <div class="col-12 text-center">
+                            <i class="fa fa-user fa-3x"></i>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Nombres" formControlName="strNombre">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Apellidos" formControlName="strApellidos">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="email" placeholder="Correo (Usuario)" formControlName="strEmail">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="password" placeholder="Contraseña" formControlName="strPassword">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="text" placeholder="Cargo" formControlName="rol">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <table class="table table-bordered" style="font-size: 0.75rem;">
+                    <thead>
+                        <tr>
+                            <th style="font-size: 0.8rem !important;" class="text-center w-1">Acceso</th>
+                            <th style="font-size: 0.8rem !important;" class="w-65">Descripcion</th>
+                            <th style="font-size: 0.8rem !important;" class="text-center w-15">Nivel de Acceso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of DataAccess">
+                            <td class="text-center">
+                                <input type="checkbox" [disabled]="!accessLevel.NivelAcceso" [value]="item.check" (change)="(item.check = (item.check==true)?false:true)" [checked]="item.check">
+                            </td>
+                            <td>{{ item.description }}</td>
+                            <td class="text-center">
+                                <label class="switch switch-label switch-outline-primary-alt">
+                                    <input type="checkbox" [disabled]="!accessLevel.NivelAcceso" class="switch-input" (change)="(item.accessLevel = (item.accessLevel==true)?false:true)" [checked]="item.accessLevel">
+                                    <!-- <span class="switch-slider" data-checked="Write" data-unchecked="Read"></span> -->
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>

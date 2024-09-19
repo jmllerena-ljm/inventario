@@ -1,0 +1,9 @@
+.iconLogout:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.iconUser:hover {
+    color: rgba(86, 86, 226, 0.774);
+    cursor: pointer;
+}

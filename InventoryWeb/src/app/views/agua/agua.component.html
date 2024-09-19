@@ -1,0 +1,267 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-lg-6 col-md-5 col-12">
+                        <h4 class="card-title">REGISTRO DE AGUA
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleAdd()">Crear</button>
+                        </h4>
+                        <p class="card-category">Control de ingreso de Agua</p>
+                    </div>
+                    <div class="col-lg-6 col-md-7 col-12">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchAgua()">
+                            <div class="input-group no-border">
+                                <input type="date" formControlName="date_ini" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Fecha Inicial...">
+                                <!-- <input type="date" formControlName="date_fin" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Fecha Final..."> -->
+                                <input type="search" formControlName="guide" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Guia...">
+                                <input type="search" formControlName="supplier" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Proveedor...">
+                                <input type="search" formControlName="type" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Tipo...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.72rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">Fecha</th>
+                            <th class="text-center" scope="col">N° Guia</th>
+                            <th class="text-right" scope="col">Cantidad</th>
+                            <th scope="col">Proveedor</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th scope="col">Observaciones</th>
+                            <!-- <th class="text-center" scope="col">Usua</th> -->
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="handleEdit(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td class="text-center">{{ item.date | date: 'dd/MM/yyyy' }}</td>
+                                <td class="text-center">{{ item.guide }}</td>
+                                <td class="text-right font-weight-bold">{{ item.qty | number: '.3-3' }}</td>
+                                <td>{{ item.supplier_ruc }}&nbsp;-&nbsp;{{item.supplier_name }}</td>
+                                <td class="text-center">{{ item.type }}</td>
+                                <td>{{ item.comment }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pt-3 row justify-content-md-center">
+                    <div class="col-md-4">
+                        <table class="" style="font-size: 0.7rem;">
+                            <th colspan="2" class="text-center">TOTALES</th>
+                            <tr *ngFor="let item of totalData; let i = index">
+                                <td class="px-3" style="font-weight: bold !important;">{{ item.name }}</td>
+                                <td class="text-right px-3">{{ item.qty | number: '.3-3' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR AGUA -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Nuevo - Registro de Agua
+    </p-header>
+    <form [formGroup]="formAdd" style="margin-bottom:0px" (ngSubmit)="saveAgua()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="N° de Guia" formControlName="guide">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Cantidad" formControlName="qty">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <mat-label>Tipo de Agua</mat-label>
+                        <select matNativeControl formControlName="type">
+                            <option [value]="item.value" *ngFor="let item of dataTypes;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <hr>
+            <h6 style="margin-top: 0.4rem;">Proveedor</h6>
+            <hr>
+            <div class="row">
+                <div class="col-md-1 text-center">
+                    <button (click)="handleSearchSupp()" mat-raised-button type="button" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                        <i class="fa fa-search"></i>
+                        <div class="ripple-container"></div>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="N° RUC" formControlName="supplier_ruc">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-7">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Razon Social" formControlName="supplier_name">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field class="mx-2">
+                        <mat-label>Observaciones</mat-label>
+                        <textarea matInput placeholder="Comentarios..." formControlName="comment"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formAdd.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR AGUA -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Registro de Agua
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateAgua()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="N° de Guia" formControlName="guide">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Cantidad" formControlName="qty">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <mat-label>Tipo de Agua</mat-label>
+                        <select matNativeControl formControlName="type">
+                            <option [value]="item.value" *ngFor="let item of dataTypes;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <hr>
+            <h6 style="margin-top: 0.4rem;">Proveedor</h6>
+            <hr class="pb-2">
+            <div class="row">
+                <div class="col-md-1 text-center">
+                    <button (click)="handleSearchSupp()" mat-raised-button type="button" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                        <i class="fa fa-search"></i>
+                        <div class="ripple-container"></div>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="N° RUC" formControlName="supplier_ruc">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-7">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Razon Social" formControlName="supplier_name">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field class="mx-2">
+                        <mat-label>Observaciones</mat-label>
+                        <textarea matInput placeholder="Comentarios..." formControlName="comment"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- BUSCAR ENTRADA EN ODOO -->
+<p-dialog [(visible)]="displaySearchSupp" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Buscar Proveedor
+    </p-header>
+    <div style="padding:5px">
+        <div class="alert alert-secondary" style="background:rgba(0, 0, 0, 0.14);margin-bottom: 0px;" role="alert">
+            <div class="row">
+                <div class="col">
+                    <form class="form-signin" [formGroup]="formSearchSupp" style="margin-bottom:0px" (ngSubmit)="searchSuppliers()">
+                        <div class="input-group no-border">
+                            <mat-form-field class="mx-2">
+                                <input matInput placeholder="N° Ruc..." formControlName="supp_ruc">
+                            </mat-form-field>
+                            <mat-form-field class="mx-2">
+                                <input matInput placeholder="Razon Social..." formControlName="supp_name">
+                            </mat-form-field>
+                            <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                <i class="fa fa-search"></i>
+                                <div class="ripple-container"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tableFixHead" style="max-height: 300px;">
+            <table class="table table-hover" style="font-size:0.78rem">
+                <thead class="text-info">
+                    <th scope="col">Ruc</th>
+                    <th scope="col">Razon Social</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of dataSuppliers;" class="clickable-row pointerHand" (click)="selectItemSupplier(item)">
+                        <td class="text-center">{{ item.type_number }}</td>
+                        <td>{{ item.name }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col">
+                <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+    <p-footer>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displaySearchSupp=false">Cerrar</button>
+    </p-footer>
+</p-dialog>

@@ -1,0 +1,50 @@
+<div class="animated fadeIn">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col">
+                    PRODUCTOS
+                </div>
+                <div class="col">
+                    <form class="form-inline" [formGroup]="formSearch">
+                        <div class="form-row float-right">
+                            <div class="form-group mb-2 p-1">
+                                <input type="search" class="form-control form-control-sm" formControlName="code" placeholder="Codigo">
+                            </div>
+                            <div class="form-group mb-2 p-1">
+                                <input type="search" class="form-control form-control-sm" formControlName="name" placeholder="Producto">
+                            </div>
+                            <div class="form-group mb-2 p-1">
+                                <button type="submit" class="btn btn-primary btn-sm" (click)="searchProductos()"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive-sm">
+                <table class="table table-bordered table-hover table-sm" style="font-size: 13px">
+                    <thead>
+                        <tr>
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Descripción</th>
+                            <th class="text-center" scope="col">Estado</th>
+                            <!-- <th class="text-center" scope="col">Usuario Modifica</th>
+                          <th class="text-center" scope="col">Fecha Modifica</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of gridData; let i = index" class="clickable-row">
+                            <td class="text-center" scope="row">{{(i+1)}}</td>
+                            <td>{{ item.default_code }}</td>
+                            <td>{{ item.name_template }}</td>
+                            <td class="text-center">{{ item.active }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

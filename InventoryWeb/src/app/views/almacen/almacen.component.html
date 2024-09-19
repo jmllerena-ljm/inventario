@@ -1,0 +1,279 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 class="card-title">ALMACEN</h4>
+                        <p class="card-category">Productos en Almacen</p>
+                    </div>
+                    <div class="col-md-9 text-right">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchAlmacen()">
+                            <div class="row" style="margin-right: 0.5rem;">
+                                <div class="col-md-6">
+                                    Ordenar por:&nbsp;
+                                    <select formControlName="columnSort">
+                                        <option [value]="item.value" *ngFor="let item of selectOrderBy;">{{ item.name }}</option>
+                                    </select>
+                                    <i *ngIf="check_asc" class="fa fa-sort-alpha-down text-button" v-model="check_asc" (click)="check_asc=!check_asc"></i>
+                                    <i *ngIf="!check_asc" class="fa fa-sort-alpha-up text-button" v-model="check_asc" (click)="check_asc=!check_asc"></i>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    Compañia:&nbsp;
+                                    <select formControlName="company" (change)="searchAlmacen()">
+                                        <option [value]="item._id" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group no-border">
+                                    <input type="search" formControlName="code" class="form-control colorPlaceholder mx-2" placeholder="Codigo...">
+                                    <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Nombre...">
+                                    <input type="search" formControlName="group" class="form-control colorPlaceholder mx-2" placeholder="Tipo...">
+                                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th scope="col">Codigo</th>
+                            <th scope="col">Nombre</th>
+                            <th class="text-center" scope="col">Und</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th class="text-center" scope="col">Stock Inicial</th>
+                            <th class="text-center" scope="col">Entradas</th>
+                            <th class="text-center" scope="col">Salidas</th>
+                            <th class="text-center" scope="col">Stock Actual</th>
+                            <th class="text-center" scope="col">Activo?</th>
+                            <th scope="col" *ngIf="accessLevel.NivelAcceso">Editar</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand">
+                                <td style="width: 9rem;" (click)="handleClick(item)">
+                                    <span style="color:rgb(30, 76, 163)"><u>{{ item.code }}</u></span>
+                                </td>
+                                <td>{{ item.name }}</td>
+                                <td class="text-center">{{ item.umed | uppercase }}</td>
+                                <td>{{ item.group }}</td>
+                                <td class="text-right">{{ item.stock_ini | number:'.2-2' }}</td>
+                                <td class="text-right">{{ item.entry | number:'.2-2' }}</td>
+                                <td class="text-right">{{ item.output | number:'.2-2' }}</td>
+                                <td class="text-right">
+                                    <span style="font-weight:bold;color:#3e3e86">{{ item.stock_now | number:'.2-2' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <i *ngIf="item.status" class="fa fa-check-circle" style="color:rgb(64, 128, 184);font-size:1rem"></i>
+                                    <i *ngIf="!item.status" class="fa fa-times-circle" style="color:#e54f82;font-size:1rem"></i>
+                                </td>
+                                <td *ngIf="accessLevel.NivelAcceso" class="td-actions text-right" style="width: 4em">
+                                    <button mat-raised-button type="button" matTooltip="Editar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-success btn-round btn-sm btn-link btn-just-icon" (click)="handleEdit(item)">
+                                        <i class="fa fa-edit"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success btn-sm" (click)="exportAsXLSX()">
+                            <i class="fas fa-cloud-download-alt"></i> 
+                            Exportar Excel
+                        </button>
+                    </div>
+                    <!-- <div class="col">
+                        Total: {{ gridData.length }}
+                    </div> -->
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDITAR ALMACEN -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Producto [{{formEdit.value.code}}]
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateAlmacen()">
+        <div style="padding:5px">
+            <div class="row text-center">
+                <div class="col">
+                    <mat-checkbox formControlName="status">Activo ?</mat-checkbox>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Codigo" formControlName="code">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <!-- <div class="form-group">
+                        <input type="text" formControlName="name" class="form-control" style="font-size: 1.5em" placeholder="Nombre">
+                    </div> -->
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Nombre del Producto" formControlName="name">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Unidad de Medida" formControlName="umed">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Grupo / Tipo Producto" formControlName="group">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-7">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Stock Inicial" formControlName="stock_ini">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <mat-label>Tipo</mat-label>
+                        <select matNativeControl formControlName="type">
+                            <option [value]="item.value" *ngFor="let item of selectType;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                    <div *ngIf="(formEdit.value.type)!=='none'">
+                        <mat-form-field class="mx-2">
+                            <input matInput type="number" placeholder="Stock de Seguridad" formControlName="stock_security">
+                        </mat-form-field>
+                        <mat-form-field class="mx-2">
+                            <input matInput type="number" placeholder="Stock Mínimo" formControlName="stock_min">
+                        </mat-form-field>
+                        <mat-form-field class="mx-2">
+                            <input matInput type="number" placeholder="Stock Máximo" formControlName="stock_max">
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <mat-checkbox formControlName="audited">Fiscalizado ?</mat-checkbox>
+                        </div>
+                        <div class="col-md-8" *ngIf="formEdit.value.audited">
+                            <mat-form-field class="mx-2">
+                                <input matInput type="number" placeholder="Cantidad Autorizada" formControlName="authorized_amount">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 d-flex justify-content-center align-items-center" *ngIf="dataHistorial.length>0">
+                    <div class="card-historial">
+                        <div class="text-center">
+                            <h6>HISTORIAL DE CAMBIOS</h6>
+                        </div>
+                        <div *ngFor="let item of dataHistorial">
+                            <i class="fa fa-pen icon-historial"></i>&nbsp;
+                            <span>{{ item.user | uppercase }}</span>&nbsp;&nbsp;&nbsp;{{item.date | date: 'dd/MM/yyyy HH:mm'}}
+                            <p class="pl-3">
+                                <strong>{{ item.action | uppercase }}</strong>&nbsp;<i class="fa fa-arrow-right"></i>&nbsp;{{ item.description }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- DETALLE ITEM ALMACEN -->
+<p-dialog [(visible)]="displayDetalle" positionTop="50" [contentStyle]="{'max-width':'1000px', 'min-width': '750px'}" modal="true">
+    <p-header>
+        Detalle - Producto
+    </p-header>
+    <mat-tab-group animationDuration="1500ms" [(selectedIndex)]="idxTab">
+        <mat-tab class="active" label="Movimientos">
+            <div>
+                <table class="table table-hover" style="font-size:0.68rem">
+                    <thead class="text-info">
+                        <th class="text-center" scope="col">#</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col" class="text-center">Tipo</th>
+                        <th scope="col">Código</th>
+                        <th scope="col" class="text-center">Producto</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio Unit.</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of detalleProducto; let i = index" class="clickable-row">
+                            <td class="text-center" scope="row">{{(i+1)}}</td>
+                            <td>{{ item.date | date: 'dd-MM-yyyy' }}</td>
+                            <td class="text-center">
+                                <span style="font-size:0.7rem" class="badge text-wrap" [ngClass]="{'badge-primary': (item.entrada.type!='IN'), 'badge-success': (item.entrada.type=='IN')}">
+                                    {{ (item.entrada.type=='IN')? 'Entrada':'Salida' }}
+                                </span>
+                            </td>
+                            <td>{{ item.code }}</td>
+                            <td>{{ item.name }}</td>
+                            <td class="text-right">{{ item.product_qty | number:'.2-3' }}</td>
+                            <td class="text-right">{{ item.price_unit | number:'.2-2' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row" style="height:30px;line-height:30px;background-color:rgb(201, 200, 200)">
+                <div class="col text-left font-weight-bold">
+                    Total
+                </div>
+                <div class="col text-right">
+                    <span>Entradas: <b>{{ SumData(detalleProducto, 'IN') | number:'.2-2' }}</b></span>
+                    <span style="padding-left:3rem">Salidas: <b>{{ SumData(detalleProducto, 'OUT') | number:'.2-2' }}</b></span>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Precios">
+            <div>
+                <table class="table table-hover" style="font-size:0.68rem">
+                    <thead class="text-info">
+                        <th class="text-center" scope="col">#</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col" class="text-center">Moneda</th>
+                        <th scope="col" class="text-right">Precio</th>
+                        <th scope="col" class="text-center">Fecha</th>
+                        <th scope="col" class="text-center">Referencia</th>
+                        <!-- <th scope="col" class="text-center">Movimiento</th> -->
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of detalleProductoPrecio; let i = index" class="clickable-row">
+                            <td class="text-center" scope="row">{{(i+1)}}</td>
+                            <td>{{ item.name_template }}</td>
+                            <td class="text-center">{{ item.currency }}</td>
+                            <td class="text-right">{{ item.price_unit | number:'.2-2' }}</td>
+                            <td class="text-center">{{ item.date | date: 'dd-MM-yyyy' }}</td>
+                            <td class="text-center">{{ item.po }}</td>
+                            <!-- <td class="text-center">{{ item.reference }}</td> -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+    <p-footer class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayDetalle=false">Cancelar</button>
+    </p-footer>
+</p-dialog>

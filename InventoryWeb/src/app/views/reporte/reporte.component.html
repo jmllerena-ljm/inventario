@@ -1,0 +1,268 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-tabs card-header-info">
+                <div class="nav-tabs-navigation">
+                    <div class="nav-tabs-wrapper">
+                        <span class="nav-tabs-title font-weight-bold">REPORTES:</span>
+                        <ul class="nav nav-tabs" data-tabs="tabs">
+                            <li class="nav-item active" (click)="handleChangeTab('moves')">
+                                <a href="#repmoves" class="nav-link" data-toggle="tab">
+                                    <i class="fa fa-edit"></i> Movimientos
+                                    <div class="ripple-container"></div>
+                                </a>
+                            </li>
+                            <li class="nav-item" (click)="handleChangeTab('licitations')">
+                                <a href="#repbidding" class="nav-link" data-toggle="tab">
+                                    <i class="fa fa-file-contract"></i> KPIs
+                                    <div class="ripple-container"></div>
+                                </a>
+                            </li>
+                            <li class="nav-item" (click)="handleChangeTab('top')">
+                                <a href="#reptopcompras" class="nav-link" data-toggle="tab">
+                                    <i class="fa fa-upload"></i> Top Compras
+                                    <div class="ripple-container"></div>
+                                </a>
+                            </li>
+                            <li class="nav-item" (click)="handleChangeTab('prices')">
+                                <a href="#reppreciospromedio" class="nav-link" data-toggle="tab">
+                                    <i class="fa fa-dollar-sign"></i> Precios Promedio
+                                    <div class="ripple-container"></div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="repmoves">
+                        <form class="form-signin" [formGroup]="formSearchMoves" (ngSubmit)="searchReporte()">
+                            <div class="row">
+                                <div class="col my-auto">
+                                    <label>REPORTE - MOVIMIENTOS DE ALMACEN</label>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group no-border">
+                                        <input type="search" formControlName="code" class="form-control mx-2" placeholder="Código...">
+                                        <input type="search" formControlName="name" class="form-control mx-2" placeholder="Nombre...">
+                                        <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                            <i class="fa fa-search"></i>
+                                            <div class="ripple-container"></div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="tableFixHead">
+                            <table class="table table-hover" style="font-size:0.68rem">
+                                <thead class="text-info">
+                                    <th class="text-center" scope="col">#</th>
+                                    <th class="text-center" scope="col">Fecha</th>
+                                    <th class="text-center" scope="col">Tipo</th>
+                                    <th scope="col">Código</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Movimiento</th>
+                                    <th class="text-center" scope="col">Cantidad</th>
+                                    <th scope="col">Compañia</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of gridData; let i = index" class="clickable-row">
+                                        <td class="text-center" scope="row">{{(i+1)}}</td>
+                                        <td class="text-center">{{ item.entrada?.date | date:'dd/MM/yyyy' }}</td>
+                                        <td class="text-center">
+                                            <span style="font-size:0.7rem" class="badge text-wrap" [ngClass]="{'badge-primary': (item.entrada?.type!='IN'), 'badge-success': (item.entrada?.type=='IN')}">
+                                                {{ (item.entrada?.type=='IN')? 'Entrada':'Salida' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ item.code }}</td>
+                                        <td>{{ item.name }}</td>
+                                        <td style="width: 9rem;" (click)="handleClick(item.entrada)">
+                                            <span style="color:rgb(30, 76, 163)"><u>{{ item.entrada?.name }}</u></span>
+                                        </td>
+                                        <td class="text-right">{{ item.product_qty | number:'.3-3' }}</td>
+                                        <td class="text-center">{{ item.entrada?.company?.short_name }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col text-right">
+                                <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                                </mat-paginator>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="repbidding">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <ng-select [(ngModel)]="selectedYear" [clearable]="false" placeholder="Seleccionar Año...">
+                                    <ng-option *ngFor="let item of dataYears" [value]="item">{{item}}</ng-option>
+                                </ng-select>
+                            </div>
+                            <div class="col-md-6">
+                                <ng-select [items]="listMonths" [multiple]="true" [closeOnSelect]="false" [searchable]="false" bindValue="id" bindLabel="name" placeholder="Seleccionar Meses..." [(ngModel)]="selectedMonthsKpis">
+                                </ng-select>
+                            </div>
+                            <div class="col-md-3">
+                                <ng-select [(ngModel)]="dataBaseFilter" [clearable]="false" placeholder="Seleccionar Compañia">
+                                    <ng-option *ngFor="let item of dataCompany" [value]="item.code_odoo">{{item.name}}</ng-option>
+                                </ng-select>
+                            </div>
+                            <div class="col-md-1">
+                                <button mat-raised-button (click)="graphSeguimiento()" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="chartEfficiency"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <table class="table" style="font-size: 0.7rem;">
+                                        <thead>
+                                            <th class="text-center">MES</th>
+                                            <th class="text-center">Items</th>
+                                            <th class="text-center">Cant.Cotizado</th>
+                                            <th class="text-center">Cant.Comprado</th>
+                                            <th class="text-center">cant.Atendido</th>
+                                            <th class="text-center">% Cotizado</th>
+                                            <th class="text-center">% Atendido</th>
+                                        </thead>
+                                        <tr *ngFor="let item of dataKpis; let i = index">
+                                            <td class="text-center">{{ item.name | uppercase }}</td>
+                                            <td class="text-center">{{ item.count_bidding }}</td>
+                                            <td class="text-center">{{ item.quoted_total }}</td>
+                                            <td class="text-center">{{ item.purchase_total }}</td>
+                                            <td class="text-center">{{ item.send_total }}</td>
+                                            <td class="text-center">{{ item.porc_quoted | percent: '.1-1' }}</td>
+                                            <td class="text-center">{{ item.porc_send | percent: '.1-1' }}</td>
+                                        </tr>
+                                        <tfoot>
+                                            <tr style="background-color: rgb(212, 212, 212);">
+                                                <td class="text-center">TOTAL GENERAL</td>
+                                                <td class="text-center">{{ totals_kpis.count_bidding }}</td>
+                                                <td class="text-center">{{ totals_kpis.quoted_total }}</td>
+                                                <td class="text-center">{{ totals_kpis.purchase_total }}</td>
+                                                <td class="text-center">{{ totals_kpis.send_total }}</td>
+                                                <td class="text-center">{{ totals_kpis.porc_quoted | percent: '.1-1' }}</td>
+                                                <td class="text-center">{{ totals_kpis.porc_send | percent: '.1-1' }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div id="chartRepLicitacion"></div>
+                                <div id="chartRepBidding"></div>
+                            </div>
+                            <!-- <div class="col-md-6">
+                                <div id="chartRepBidding"></div>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="reptopcompras">
+                        <div class="text-center">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <ng-select [(ngModel)]="selectedYear" [clearable]="false" placeholder="Seleccionar Año...">
+                                        <ng-option *ngFor="let item of dataYears" [value]="item">{{item}}</ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-6">
+                                    <ng-select [items]="listMonths" [multiple]="true" [closeOnSelect]="false" [searchable]="false" bindValue="id" bindLabel="name" placeholder="Seleccionar Meses..." [(ngModel)]="selectedMonthsTop">
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-3">
+                                    <ng-select [(ngModel)]="dataBaseFilter" [clearable]="false" placeholder="Seleccionar Compañia">
+                                        <ng-option *ngFor="let item of dataCompany" [value]="item.code_odoo">{{item.name}}</ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button mat-raised-button (click)="topCompras()" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <div class="">
+                                    <label>TOP 30 - COMPRAS DEL MES</label>
+                                    <table class="" style="font-size:0.68rem">
+                                        <thead class="">
+                                            <th class="text-center">#</th>
+                                            <th class="text-center">Producto</th>
+                                            <th class="text-center">Cantidad</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let item of gridTopCompras; let i = index" class="clickable-row">
+                                                <td class="text-center" scope="row">{{(i+1)}}:</td>
+                                                <td class="text-left">{{ item.product_name }}</td>
+                                                <td class="text-right">{{ item.count_product | number:'.1-3' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <div class="">
+                                    <label>COMPRAS DEL MES POR AREAS</label>
+                                    <table class="" style="font-size:0.68rem;width:100%">
+                                        <thead class="">
+                                            <th class="text-center">#</th>
+                                            <th class="text-center">Area</th>
+                                            <th class="text-center">Cantidad</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let item of gridComprasArea; let i = index" class="clickable-row">
+                                                <td class="text-center" scope="row">{{(i+1)}}:</td>
+                                                <td class="text-left">{{ item.area_name }}</td>
+                                                <td class="text-right">{{ item.count_area | number:'.1-3' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="chartComprasArea"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="reppreciospromedio">
+                        <div class="row" class="mt-3">
+                            <label>PRECIOS PROMEDIO / PRODUCTO</label><br>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <ng-select [(ngModel)]="selectedYear" [clearable]="false" placeholder="Seleccionar Año...">
+                                        <ng-option *ngFor="let item of dataYears" [value]="item">{{item}}</ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-6">
+                                    <ng-select [(ngModel)]="selectedProductIds" [multiple]="true" [clearable]="false" placeholder="Seleccionar Producto..." (input)="searchProductos($event.target.value)">
+                                        <ng-option *ngFor="let item of products" [value]="item.product_id">[{{item.code}}]&nbsp;{{item.name}}</ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-3">
+                                    <ng-select [(ngModel)]="companyFilter" [clearable]="false" placeholder="Seleccionar Compañia">
+                                        <ng-option *ngFor="let item of dataCompany" [value]="item._id">{{item.name}}</ng-option>
+                                    </ng-select>
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <button mat-raised-button (click)="loadPreciosPromedioProducto()" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div> -->
+                            </div>
+                            <app-precio-promedio-producto *ngFor="let item of selectedProductIds" [idProducto]="item" [year]="selectedYear" [company]="companyFilter"></app-precio-promedio-producto>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

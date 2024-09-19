@@ -1,0 +1,295 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4 class="card-title">RECIBOS DE EGRESOS
+                        </h4>
+
+                        <p class="card-category">
+                            <button (click)="handleAdd()" *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm">Nuevo</button> Recibos de Egresos generados
+                        </p>
+                    </div>
+                    <div class="col-md-5 text-right">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchRecibos()">
+                            <div class="row" style="margin-right: 0.5rem;">
+                                <div class="col-md-5">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Codigo" formControlName="code">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-5">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Compañia" formControlName="company">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-2">
+                                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">Codigo</th>
+                            <th class="text-center" scope="col">Fecha</th>
+                            <th scope="col">Compañia</th>
+                            <th scope="col">Solicita</th>
+                            <th class="text-center" scope="col">Moneda</th>
+                            <th class="text-center" scope="col">Monto</th>
+                            <th scope="col">Concepto</th>
+                            <th scope=col>Estado</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="onSelected(item._id)" [ngStyle]="{'color': (item.state=='borrador')?'red': 'black'}">
+                                <td class="text-center" scope="row">{{ item.code }}</td>
+                                <td class="text-center">{{ item.date | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ item.company }}</td>
+                                <td>{{ item.user_request }}</td>
+                                <td class="text-center">{{ item.currency }}</td>
+                                <td class="text-right">{{(item.currency=='PEN'?'S/':'$')}}&nbsp;{{ item.amount_number | number: '.2-2' }}</td>
+                                <td>{{ item.concept }}</td>
+                                <td>{{ item.state | uppercase }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR RECIBO -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'1000px', 'min-width': '400px'}" modal="true">
+    <p-header>
+        Generar Nuevo Recibo
+    </p-header>
+    <form [formGroup]="formCreate" style="margin-bottom:0px" (ngSubmit)="saveRecibo()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <mat-label>Empresa</mat-label>
+                        <select matNativeControl formControlName="company">
+                            <option [value]="item.name" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <mat-label>Moneda</mat-label>
+                        <select matNativeControl formControlName="currency" (change)="changeAmount(formCreate)">
+                            <option [value]="item.value" *ngFor="let item of dataCurrency;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Monto</mat-label>
+                        <span matPrefix style="color:rgb(48, 96, 134)">{{(formCreate.value.currency=='PEN')?'S/':'$'}} &nbsp;</span>
+                        <input type="number" matInput placeholder="0.0" formControlName="amount_number" (blur)="changeAmount(formCreate)">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Monto" formControlName="amount_text">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Solicita" formControlName="user_request">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field>
+                        <textarea matInput type="text" placeholder="Concepto" formControlName="concept"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <table>
+                        <thead>
+                            <tr style="background: blue !important;">
+                                <th scope="col" colspan="2" class="text-center">CAJA</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td scope="col">Cta</td>
+                            <td scope="col">
+                                <input matInput type="text" placeholder="*" formControlName="account">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td scope="col"># Op</td>
+                            <td scope="col">
+                                <input matInput type="text" placeholder="*" formControlName="operation">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- <div class="col-md-4">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Autoriza" formControlName="code_authorized" (keyup.enter)="getFirma(formCreate.value.code_authorized, 'authorized')">
+                    </mat-form-field>
+                    <span style="font-size: 0.75rem;" class="font-weight-bold">{{perAutoriza}}</span>
+                </div> -->
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Solicita (introduce código)" formControlName="code_request" (keyup.enter)="getFirma(formCreate.value.code_request, 'request')" autocomplete="off">
+                    </mat-form-field>
+                    <span style="font-size: 0.75rem;" class="font-weight-bold">{{perSolicita}}</span>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formCreate.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Generar Recibo
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<p-dialog [(visible)]="displayDetail" positionTop="50" [contentStyle]="{'max-width':'1000px', 'min-width': '400px'}" modal="true">
+    <p-header>
+        Recibo N° {{ formDetail.code }}
+    </p-header>
+    <div style="padding:5px">
+        <form [formGroup]="formEdit">
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <mat-label>Empresa</mat-label>
+                        <select matNativeControl formControlName="company">
+                            <option [value]="item.name" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <mat-label>Moneda</mat-label>
+                        <select matNativeControl formControlName="currency" (change)="changeAmount(formEdit)">
+                            <option [value]="item.value" *ngFor="let item of dataCurrency;">{{ item.name }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Monto</mat-label>
+                        <span matPrefix style="color:rgb(48, 96, 134)">{{(formDetail.currency=='PEN')?'S/':'$'}} &nbsp;</span>
+                        <input type="number" matInput placeholder="0.0" formControlName="amount_number" (blur)="changeAmount(formEdit)">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Monto" formControlName="amount_text">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Solicita" formControlName="user_request">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field>
+                        <textarea matInput type="text" placeholder="Concepto" formControlName="concept"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-md-4">
+                <table>
+                    <thead>
+                        <tr style="background: blue !important;">
+                            <th scope="col" colspan="2" class="text-center">CAJA</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td scope="col">Cta</td>
+                        <td scope="col">
+                            <input matInput type="text" readonly placeholder="-" [value]="formDetail.account">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td scope="col"># Op</td>
+                        <td scope="col">
+                            <input matInput type="text" readonly placeholder="-" [value]="formDetail.operation">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field>
+                    <input matInput readonly type="text" placeholder="Solicita" [value]="perSolicita">
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <div *ngIf="!check_authorized">
+                    <mat-form-field>
+                        <input matInput type="text" placeholder="Autoriza" [(ngModel)]="codeAuthorized_edit" (keyup.enter)="getFirma(codeAuthorized_edit, 'authorized')" autocomplete="off">
+                    </mat-form-field>
+                    <span style="font-size: 0.75rem;" class="font-weight-bold">{{perAutoriza}}</span>
+                </div>
+                <div *ngIf="check_authorized">
+                    <mat-form-field>
+                        <input matInput readonly type="text" placeholder="Autoriza" [value]="perAutoriza">
+                    </mat-form-field>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <p-footer class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayDetail=false">Cancelar</button>
+        <button *ngIf="(identity.blnSuperAdmin)" type="button" (click)="deleteRecibo()" class="btn btn-danger btn-sm">
+            <i class="fa fa-delete"></i> Anular Recibo
+        </button>
+        <button *ngIf="(check_authorized)" type="button" (click)="printRecibo()" class="btn btn-info btn-sm">
+            <i class="fa fa-print"></i> Imprimir
+        </button>
+        <button *ngIf="(!check_authorized)" [disabled]="idAuthorized_edit=='-1'" type="button" (click)="authorizedRecibo()" class="btn btn-primary btn-sm">
+            <i class="fas fa-thumbs-up"></i> Autorizar Recibo
+        </button>
+        <button *ngIf="(!check_authorized)" [disabled]="!formEdit.valid" [disabled]="idAuthorized_edit=='-1'" type="button" (click)="updateRecibo()" class="btn btn-success btn-sm">
+            <i class="fa fa-save"></i> Guardar
+        </button>
+    </p-footer>
+</p-dialog>

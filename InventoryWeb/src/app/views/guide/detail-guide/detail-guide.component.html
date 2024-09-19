@@ -1,0 +1,104 @@
+<div style="margin-bottom:0px;font-size: 0.8rem;">
+    <div style="padding:5px">
+        <div class="row">
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Fecha Inicio Translado" readonly [value]="formGuide.date | date: 'dd/MM/yyyy'">
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Destinatario" readonly [value]="formGuide.receiver">
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Punto de Partida" readonly [value]="formGuide.starting_point">
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Punto de Llegada" readonly [value]="formGuide.arrival_point">
+                </mat-form-field>
+            </div>
+            <div class="col-md-1">
+                <button mat-raised-button (click)="imprimirGuia()" type="button" matTooltip="Imprimir Guia" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm">
+                  <i class="fas fa-file-pdf"></i> Impriimir
+                  <div class="ripple-container"></div>
+              </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="RUC o Doc de Ident." readonly [value]="formGuide.doc_identify">
+                </mat-form-field>
+            </div>
+            <div class="col">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Factura N°" readonly [value]="formGuide.number_invoice">
+                </mat-form-field>
+            </div>
+            <div class="col">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="N° GRR" readonly [value]="formGuide.number_guide">
+                </mat-form-field>
+            </div>
+        </div>
+        <span>Transportista</span><br>
+        <div class="row">
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Transportista" readonly [value]="formGuide.carrier_name">
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="RUC" readonly [value]="formGuide.carrier_ruc">
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Marca vehículo" readonly [value]="formGuide.vehicle_mark">
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Placa N°" readonly [value]="formGuide.plate_number">
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="Constancia de Inscrip." readonly [value]="formGuide.constancy_ins">
+                </mat-form-field>
+            </div>
+            <div class="col-md-2">
+                <mat-form-field class="mx-2">
+                    <input matInput placeholder="N° Licencia Cond." readonly [value]="formGuide.license_number">
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tableFixHead" style="max-height: 40vh !important;">
+    <table class="table table-hover table-sm table-bordered" style="font-size: 0.6rem;">
+        <thead>
+            <th scope="col" class="text-center">#</th>
+            <th scope="col" class="text-center">Descripción</th>
+            <th scope="col" class="text-center">Unidad</th>
+            <th scope="col" class="text-center">Cantidad</th>
+            <th scope="col" class="text-center">N° PO</th>
+            <th scope="col" class="text-center">N° Licitación</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of detailGuide; let i = index" class="clickable-row pointerHand">
+                <td class="text-center" scope="row">{{(i+1)}}</td>
+                <td style="width: 45%"><input type="text" style="width:100%" readonly [value]="item.description"></td>
+                <td style="width: 15%"><input type="text" style="width:100%" readonly [value]="item.unit"></td>
+                <td style="width: 12%"><input type="text" style="width:100%" readonly [value]="item.qty"></td>
+                <td style="width: 14%"><input type="text" style="width:100%" readonly [value]="item.purchase_order"></td>
+                <td style="width: 14%"><input type="text" style="width:100%" readonly [value]="item.number_lic"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

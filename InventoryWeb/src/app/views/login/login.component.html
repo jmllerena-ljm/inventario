@@ -1,0 +1,37 @@
+<div class="">
+    <div class="container">
+        <div class="card card-container">
+            <img class="mx-auto img-fluid" style="height: 3rem;width: 80%;" src="assets/img/logo.png" alt="">
+            <h4 class="text-center text-info" style="color: rgb(10, 30, 68, 0.82) !important;">Login MRP</h4>
+            <!-- <img id="profile-img" class="profile-img-card" src="assets/img/mrp_icon.png" /> -->
+            <i style="color:rgb(10, 30, 68)" class="fa fa-user-circle fa-7x text-center"></i>
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin" [formGroup]="forma" (ngSubmit)="IngresarSistema()">
+                <div class="row">
+                    <div class="col-md-12">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Usuario</mat-label>
+                            <input matInput placeholder="example@email.com" autocomplete="username" formControlName="strUsuario" autofocus>
+                            <i class="fa fa-user" style="color: rgb(10, 30, 68, 0.82)" matSuffix></i>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Contraseña</mat-label>
+                            <input matInput type="password" placeholder="password" autocomplete="current-password" formControlName="strPassword">
+                            <i class="fa fa-key" style="color: rgb(10, 30, 68, 0.82)" matSuffix></i>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block btn-signin text-uppercase" [disabled]="!forma.valid" type="submit">
+                    Ingresar
+                </button>
+            </form>
+            <!-- <a href="#" class="forgot-password">
+                Forgot the password?
+            </a> -->
+        </div>
+    </div>
+</div>

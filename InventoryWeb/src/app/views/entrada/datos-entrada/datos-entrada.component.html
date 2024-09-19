@@ -1,0 +1,90 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4 class="card-title">MOVIMIENTOS
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" [routerLink]="['/menu/movimientos/crear']">Nuevo</button>
+                        </h4>
+                        <p class="card-category">Movimientos de Almacen</p>
+                    </div>
+                    <div class="col-md-8 text-right">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchEntradas()">
+                            <div class="row" style="margin-right: 0.5rem;">
+                                <div class="col-md-12 text-right">
+                                    Compañia:&nbsp;
+                                    <select formControlName="company" (change)="searchEntradas()">
+                                        <option [value]="item._id" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field>
+                                        <input matInput type="date" placeholder="Fecha Inicio" formControlName="date_ini">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field>
+                                        <input matInput type="date" placeholder="Fecha Fin" formControlName="date_fin">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field>
+                                        <input matInput placeholder="Doc.Almacen" formControlName="name">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-1">
+                                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- <div class="input-group no-border">
+                                <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="Doc.Almacen...">
+                                <input matInput type="date" class="form-control colorPlaceholder mx-2" placeholder="Fecha Inicio" formControlName="date_ini">
+                                <input matInput type="date" class="form-control colorPlaceholder mx-2" placeholder="Fecha Inicio" formControlName="date_fin">
+                                <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">Fecha</th>
+                            <th scope="col">Doc. Almacen</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th scope="col">Referencia</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="onSelected(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td class="text-center">{{ item.date | dateLocale: 'es-PE'}}</td>
+                                <td>{{ item.name }}</td>
+                                <td class="text-center">
+                                    <span style="font-size:0.7rem" class="badge text-wrap" [ngClass]="{'badge-primary': (item.type!='IN'), 'badge-success': (item.type=='IN')}">{{ (item.type=='IN')? 'Entrada':'Salida' }}</span>
+                                </td>
+                                <td>{{ item.origin }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,118 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "~@ng-select/ng-select/themes/default.theme.css";
+.pointerHand {
+    cursor: pointer;
+}
+
+.colorPlaceholder {
+    color: white !important;
+}
+
+.colorPlaceholder::placeholder {
+    color: #ffffff9e !important;
+}
+
+.animated {
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+.fast {
+    -webkit-animation-duration: 0.4s;
+    animation-duration: 0.4s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+}
+
+.alert {
+    padding: 5px 15px !important;
+}
+
+.tableFixHead {
+    overflow-y: auto;
+    max-height: 74vh;
+}
+
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+}
+
+th {
+    background: #eee;
+}
+
+label {
+    margin-bottom: 0px;
+}
+
+hr {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.card-header {
+    padding: 0.4rem 1.25rem !important;
+    border-bottom: 1px solid #ece7e7 !important;
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+    cursor: no-drop;
+}
+
+.btn-success.disabled,
+.btn-success:disabled {
+    cursor: no-drop;
+}
+
+.navbar-toggler {
+    padding: 0.40rem 0.5rem !important;
+    border: 1px solid #8a8888 !important;
+    /* background-color: #5783ff !important; */
+}
+
+.text-button {
+    cursor: pointer;
+    padding: 0.1rem 0.5rem;
+    font-size: 1rem;
+}
+
+.text-button:hover {
+    color: cornflowerblue;
+    font-size: 1.05rem;
+}
+
+select {
+    border-radius: 0.5rem;
+    color: #5e5e5e;
+}
+
+.tag-primary {
+    background: #0269b9;
+    color: white;
+    border-radius: 50%;
+    padding: 0.3rem 0.5rem;
+}
+
+
+/* .table th,
+.table td {
+    border-top: 1px solid rgb(186, 217, 220, 0.64) !important;
+} */

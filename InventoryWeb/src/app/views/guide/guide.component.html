@@ -1,0 +1,71 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">GUIAS GENERADAS</h4>
+                        <p class="card-category">Control de Guias</p>
+                    </div>
+                    <div class="col">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchGuias()">
+                            <div class="input-group no-border">
+                                <input type="date" formControlName="date_ini" class="form-control colorPlaceholder mx-2" placeholder="Fecha Inicio...">
+                                <input type="date" formControlName="date_fin" class="form-control colorPlaceholder mx-2" placeholder="Fecha Fin...">
+                                <input type="search" formControlName="number_guide" class="form-control colorPlaceholder mx-2" placeholder="N° Guia...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                  <i class="fa fa-search"></i>
+                                  <div class="ripple-container"></div>
+                              </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">Fecha</th>
+                            <th class="text-center" scope="col">N° Guia</th>
+                            <th scope="col">Destinatario</th>
+                            <th scope="col">N° Factura</th>
+                            <th scope="col">Transportista</th>
+                            <th scope="col">Punto Partida</th>
+                            <th scope="col">Punto Llegada</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="handleDetail(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td>{{ item.date | date: 'dd/MM/yyyy' }}</td>
+                                <td class="text-center" style="font-weight:bold">{{ item.number_guide }}</td>
+                                <td>{{ item.receiver }}</td>
+                                <td>{{ item.number_invoice }}</td>
+                                <td>{{ item.carrier_name }}</td>
+                                <td>{{ item.starting_point }}</td>
+                                <td>{{ item.arrival_point }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETALLE GUIA -->
+<!-- [contentStyle]="{'width':'90vw'}" -->
+<p-dialog [(visible)]="displayDetail" positionTop="50" [contentStyle]="{'width': '90vw'}" modal="true" (onHide)="closeDetail()">
+    <p-header>
+        Detalle - Guia
+    </p-header>
+    <div *ngIf="idEditGuia">
+        <app-detail-guide [id_guide]="idEditGuia"></app-detail-guide>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-outline-danger btn-sm" (click)="closeDetail()">
+            Cerrar
+        </button>
+    </div>
+</p-dialog>

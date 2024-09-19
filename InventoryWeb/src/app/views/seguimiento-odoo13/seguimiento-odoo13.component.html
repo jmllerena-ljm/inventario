@@ -1,0 +1,1063 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="card-title">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4>Seguimiento de Compras- Odoo 13</h4>
+                        </div>
+                        <div class="col-6 text-right">
+                            Compañia:&nbsp;
+                            <select [(ngModel)]="dataBaseFilter" (change)="searchOdooSeguimientos()">
+                                <option [value]="item.code_odoo" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchOdooSeguimientos()">
+                    <div class="card-category">
+                        <div class="row">
+                            <div class="col-sm-11">
+                                <div class="row">
+                                    <div class="col-md-3 col-6">
+                                        <mat-form-field>
+                                            <input matInput type="date" placeholder="Lic. Fecha Inicio" formControlName="date_ini">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <mat-form-field>
+                                            <input matInput type="date" placeholder="Lic. Fecha Fin" formControlName="date_fin">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="N°Licitación" formControlName="lic_name">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Descripción Producto" formControlName="prod_name">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1 col-6">
+                                <span style="margin-top: 10px;font-size: 0.7rem;">
+                                    <mat-checkbox formControlName="con_saldo"></mat-checkbox>
+                                    Con Saldo
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-11">
+                                <div class="row">
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Solicitante" formControlName="solicitante">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Tipo" formControlName="type">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="SOLPE" formControlName="number_solpe">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-3 col-6">
+                                        <mat-form-field class="colorPlaceholder">
+                                            <input class="colorPlaceholder mx-2" type="search" matInput placeholder="N°Guía" formControlName="guide">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body">
+                <div *ngIf="dataCheckSelected.length>0" style="border: #c7c7c7 1px solid;padding:0.3rem 0.5rem;border-radius: 5px;">
+                    <form [formGroup]="formEditGeneral" style="margin-bottom:0px;font-size:0.8rem" (ngSubmit)="guardarGeneral()">
+                        <div class="row">
+                            <div class="col-md-2 my-auto">
+                                <span style="color:grey;font-size: 0.6;"><u>Actualizar Datos</u></span>
+                            </div>
+                            <div class="col-md-2 my-auto">
+                                <mat-checkbox formControlName="authorized">Autorizado</mat-checkbox>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput type="date" placeholder="Fecha de Autorización" formControlName="date2" value="{{itemEdit.date_approved | date: 'yyyy-MM-dd'}}">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <mat-label>Tipo</mat-label>
+                                    <select matNativeControl formControlName="type">
+                                      <option [value]="item.name" *ngFor="let item of dataTypes;">{{ item.text }}</option>
+                                    </select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput placeholder="SOLPE" formControlName="number_solpe">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2 my-auto text-right">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fa fa-save"></i> Guardar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput type="number" placeholder="Comprado" formControlName="purchase">
+                                    <span matSuffix>&nbsp;%</span>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput type="number" placeholder="Recibos" formControlName="received">
+                                    <span matSuffix>&nbsp;%</span>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput type="number" placeholder="Enviado" formControlName="sent">
+                                    <span matSuffix>&nbsp;%</span>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput placeholder="N° Guia" formControlName="guide">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-2">
+                                <mat-form-field>
+                                    <input matInput type="date" placeholder="Fecha de Envio" formControlName="send_date">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.6rem">
+                        <thead class="text-info">
+                            <th scope="col" class="text-center" *ngIf="accessLevel.NivelAcceso">
+                                <mat-checkbox (change)="changeCheckGeneral()" [(ngModel)]="checkGeneral" [checked]="checkGeneral"></mat-checkbox>
+                            </th>
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">N°Licitación</th>
+                            <th class="text-center" scope="col">Fecha</th>
+                            <th class="text-center" scope="col">Solicitante</th>
+                            <th class="text-center" scope="col">Producto</th>
+                            <th scope="col">Descripción</th>
+                            <th class="text-center" scope="col">Und</th>
+                            <th class="text-center" scope="col">Cant. Solicitada</th>
+                            <th class="text-center" scope="col">Saldo xPedir</th>
+                            <th class="text-center" scope="col">Estado</th>
+                            <th class="text-center" scope="col">Autorizado</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th class="text-center" scope="col">Solpe</th>
+                            <th class="text-center" scope="col">N°Guia</th>
+                            <th class="text-center" scope="col">PO</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" [ngStyle]="{'background-color': (item.check_status)?'#c6ffb3':'white'}">
+                                <td class="text-center" *ngIf="accessLevel.NivelAcceso">
+                                    <mat-checkbox (change)="changeCheckItem(item)" [(ngModel)]="item.check_seg" [checked]="item.check_seg"></mat-checkbox>
+                                </td>
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{ item.lic_number }}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{ item.lic_date | date: 'dd/MM/yyyy' : 'GMT+5' }}</td>
+                                <td (click)="handleClick(item)">{{ item.solicitante }}</td>
+                                <td (click)="handleClick(item)">[{{ item.prod_code }}]&nbsp;{{ item.prod_name }}</td>
+                                <td (click)="handleClick(item)">{{ item.descripcion }}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{ item.uom }}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{ item.cantidad | number: '.0-2' }}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{ item.saldo_pedir | number: '.0-2' }}</td>
+                                <td class="text-center" (click)="handleClick(item)">
+                                    <span style="font-size:0.6rem" class="badge text-wrap text-uppercase" [ngClass]="{'badge-primary': (item.state!='draft'), 'badge-danger': (item.state=='draft')}">{{ item.state }}</span>
+                                </td>
+                                <td class="text-center" (click)="handleClick(item)">
+                                    <i class="fa fa-check-square" style="color:green;font-size: 1rem;" *ngIf="item.authorized || item.state == 'aprobado'"></i>
+                                </td>
+                                <td class="text-left" (click)="handleClick(item)">{{item.type}}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{item.number_solpe}}</td>
+                                <td class="text-center" (click)="handleClick(item)">{{item.guide}}</td>
+                                <td class="text-center" (click)="handleClick(item)">
+                                    <span style="font-size:0.6rem" class="badge  badge-success text-wrap">{{ item.po_name }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success btn-sm" (click)="exportFullData()">
+                            <i class="fas fa-cloud-download-alt"></i>
+                            Exportar Excel
+                        </button>
+                        <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleSendMail()">
+                            <i class="far fa-envelope"></i>
+                            Generar Correo
+                        </button>
+                        <!-- <button *ngIf="accessLevel.NivelAcceso && showEditItems" class="btn btn-success btn-sm" (click)="handleEvaluation()" data-toggle="tooltip" data-placement="bottom" title="Evaluacion de Proveedores">
+                            <i class="fas fa-clipboard-check"></i>
+                            Evaluacion
+                        </button> -->
+                        <button *ngIf="accessLevel.NivelAcceso" class="btn btn-info btn-sm" (click)="handleImprimirGuia()">
+                            <i class="fas fa-print"></i>
+                            Imprimir Guia
+                        </button>
+                        <!-- <button mat-mini-fab color="warn" aria-label="Example icon button with a filter list icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </button> -->
+
+                    </div>
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+                <div *ngIf="dataCheckSelected.length > 0">
+                    <table class="mat-elevation-z8" style="font-size:0.6rem;width: 100%;">
+                        <thead class="pointerHand">
+                            <th colspan="4" scope="col" (click)="explandSelectedItems = !explandSelectedItems" style="padding: 0.8rem 1rem;font-size: 0.7rem;color:#0269b9;">
+                                <i class="fas fa-clipboard-check"></i> Items Seleccionados
+                                <span class="tag-primary">{{dataCheckSelected.length}}</span>
+                                <i [ngClass]="{'fa-chevron-up': explandSelectedItems, 'fa-chevron-down': !explandSelectedItems}" class="fas" style="float:right"></i>
+                            </th>
+                        </thead>
+                        <tbody class="animated fadeIn fast" *ngIf="explandSelectedItems">
+                            <tr *ngFor="let item of dataCheckSelected; let i = index" class="clickable-row">
+                                <td style="padding-left: 1rem;">{{ item.prod_name }}</td>
+                                <td class="text-center">{{ item.po_name }}</td>
+                                <td class="text-center">{{ item.lic_number }}</td>
+                                <td class="text-right">
+                                    <button mat-icon-button color="accent" (click)="deleteSelectedItem(item)" aria-label="Example icon button with a menu icon">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDITAR SEGUIMIENTO -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'80rem', 'min-width': '20rem'}" modal="true">
+    <p-header>
+        Seguimiento - [{{itemEdit.prod_code}}] {{itemEdit.prod_name}}
+        <span class="badge badge-primary text-uppercase">{{(itemEdit.company ? itemEdit.company : dataBaseFilter)}}</span>
+    </p-header>
+
+    <ul class="nav nav-tabs" style="background-color: #5488ad !important;">
+        <li class="nav-item">
+            <a href="#datasecom" class="nav-link active" data-toggle="tab">
+                <i class="fa fa-file-text-o" style="font-size:14px;"></i> Datos
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="accessLevel.NivelAcceso">
+            <a href="#evalsecom" class="nav-link" data-toggle="tab">
+                <i class="fa fa-edit" style="font-size:14px;"></i> Evaluación Proveedor
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="!accessLevel.NivelAcceso">
+            <a href="#evalsecomread" class="nav-link" data-toggle="tab">
+                <i class="fa fa-edit" style="font-size:14px;"></i> Evaluación Proveedor
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="datasecom">
+            <form [formGroup]="formEdit" style="margin-bottom:0px;font-size:0.72rem" (ngSubmit)="updateSeguimiento()">
+                <div style="padding:5px">
+                    <div class="row">
+                        <div class="col-md-11">
+                            <h6>Licitación:&nbsp;<span class="font-weight-bold" style="font-size: 0.9rem;color: rgb(30, 36, 85);">{{itemEdit.lic_number}}</span></h6>
+                        </div>
+                        <div class="col-md-1">
+                            <span style="font-size:0.8rem" class="badge text-wrap text-uppercase" [ngClass]="{'badge-primary': (itemEdit.state!='draft'), 'badge-danger': (itemEdit.state=='draft')}">{{ itemEdit.state }}</span>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-3"><label for="">Fecha</label></div>
+                                <div class="col-md-9"><span>{{itemEdit.lic_date|date:'dd/MM/yyyy'}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-3"><label for="">Solicitante</label></div>
+                                        <div class="col-md-9"><span>{{itemEdit.solicitante}}</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-3"><label for="">Aprobado</label></div>
+                                        <div class="col-md-9" *ngIf="itemEdit.state!='draft'"><span>{{itemEdit.approved | uppercase}} <small style="font-weight:bold">({{itemEdit.date_approved | date: 'dd/MM/yyyy'}})</small></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="row">
+                                <div class="col-md-5"><label for="">Fecha Compra</label></div>
+                                <div class="col-md-7"><span>{{itemEdit.date_order|date:'dd/MM/yyyy'}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-3"><label for="">Área</label></div>
+                                <div class="col-md-9"><span>{{itemEdit.area_odoo}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-3"><label for="">Centro de Costo</label></div>
+                                        <div class="col-md-9"><span>{{itemEdit.cc_name}}</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-3"><label for="">Proveedor</label></div>
+                                        <div class="col-md-9"><span>{{itemEdit.proveedor}}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="row">
+                                <div class="col-md-5"><label for="">N° PO</label></div>
+                                <div class="col-md-7"><span style="font-size:0.8rem" class="badge badge-success text-wrap">{{ itemEdit.po_number }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 style="margin-top: 0.4rem;">Producto</h6>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3"><label for="">Producto</label></div>
+                                <div class="col-md-9"><span class="font-weight-bold">{{'['+itemEdit.prod_code+'] '+itemEdit.prod_name}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="row">
+                                <div class="col-md-6"><label for="">Unidad de Medida</label></div>
+                                <div class="col-md-6"><span>{{itemEdit.uom}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-7"><label for="">Cantidad Solicitada</label></div>
+                                        <div class="col-md-5"><span>{{itemEdit.cantidad | number: '.0-2'}}</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-7"><label for="">Saldo por pedir</label></div>
+                                        <div class="col-md-5"><span>{{itemEdit.saldo_pedir | number:'.0-2'}}</span></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-7"><label for="">Stock Almacen</label></div>
+                                        <div class="col-md-5"><span>{{itemEdit.stock_almacen | number:'.0-2'}}</span></div>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-7"><label for="">Pendiente x Aten.</label></div>
+                                        <div class="col-md-5"><span>{{itemEdit.pendiente_aten | number:'.0-2'}}</span></div>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3"><label for="">Descripcion</label></div>
+                                <div class="col-md-9"><span>{{itemEdit.descripcion}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3"><label for="">Justificación</label></div>
+                                <div class="col-md-9"><span>{{itemEdit.justificacion}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-6"><label for="">Fec. llegada Planta</label></div>
+                                <div class="col-md-6"><span>{{itemEdit.fecha_llegada|date:'dd/MM/yyyy'}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 style="margin-top: 0.4rem;">Ingreso de Datos</h6>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-2 my-auto">
+                            <mat-checkbox formControlName="authorized">Autorizado</mat-checkbox>
+                        </div>
+                        <div class="col-md-2">
+                            <mat-form-field>
+                                <input matInput type="date" placeholder="Fecha de Autorización" formControlName="date2">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field>
+                                <mat-label>Tipo</mat-label>
+                                <select matNativeControl formControlName="type">
+                                  <option [value]="item.name" *ngFor="let item of dataTypes;">{{ item.text }}</option>
+                                </select>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field>
+                                <input matInput placeholder="N° SOLPE" formControlName="number_solpe">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-2 my-auto">
+                            <mat-checkbox formControlName="urgent">Urgente</mat-checkbox>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <mat-form-field>
+                                <input matInput type="number" placeholder="Cotizado" formControlName="quoted">
+                                <span matSuffix>&nbsp;%</span>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-1">
+                            <mat-form-field>
+                                <input matInput type="number" placeholder="Comprado" formControlName="purchase">
+                                <span matSuffix>&nbsp;%</span>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-1">
+                            <mat-form-field>
+                                <input matInput type="number" placeholder="Recibos" formControlName="received">
+                                <span matSuffix>&nbsp;%</span>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-1">
+                            <mat-form-field>
+                                <input matInput type="number" placeholder="Enviado" formControlName="sent">
+                                <span matSuffix>&nbsp;%</span>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-2">
+                            <mat-form-field>
+                                <input matInput type="text" placeholder="Guia" formControlName="guide">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-2">
+                            <mat-form-field>
+                                <input matInput type="date" placeholder="Fecha de Envio" formControlName="send_date">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <p-footer class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+                    <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                        <i class="fa fa-save"></i> Guardar
+                    </button>
+                </p-footer>
+            </form>
+        </div>
+        <!-- EVALUACION - WRITE -->
+        <div class="tab-pane fade" id="evalsecom">
+            <div class="flecha">
+                <div class="row">
+                    <div class="col-md-1">
+                        <span style="margin-right: 1rem;" class="badge  badge-primary text-wrap"> UND: {{ itemEdit.cantidad }}</span>
+                    </div>
+                    <div class="col-md-5">
+                        {{itemEdit.descripcion}}
+                    </div>
+                    <div class="col-md-4">
+                        <table>
+                            <tr>
+                                <td><span style="font-size: 0.68rem;">CUADRO&nbsp;COMPARATIVO&nbsp;N°</span></td>
+                                <td><input style="font-weight: bold;" type="text" [(ngModel)]="codigo_eval" (blur)="changeCodigoEval(codigo_eval)"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-2 Block">
+                        <div class="btn-group my-auto" role="group">
+                            <span style="font-size:0.6rem; padding-top:0.2rem;padding-right:0.1rem;">Añadir Evaluación</span>
+                            <button style="font-size: 0.7rem" type="button" class="" (click)="addItemEval()" data-toggle="tooltip" data-placement="bottom" title="Crear evaluacion vacia">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button style="font-size: 0.7rem" type="button" (click)="displayUploadFile=true" data-toggle="tooltip" data-placement="bottom" title="Subir Archivo">
+                                <i class="fa fa-upload"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-y: auto;max-height: 60vh;">
+                <div class="row no-gutters">
+                    <div class="col-md-4" style="padding:0.3rem 0.4rem" *ngFor="let item of dataEvaluacion; let idx = index">
+                        <div class="simplecard" [ngStyle]="{'background': (item.status)?'#d0ecd0':'#eaf5f5', 'border': (item.status)?'#4dbb5b 2px solid':'rgb(90, 150, 158) 2px solid'}">
+                            <div class="">
+                                <table>
+                                    <tbody style="font-size: 0.7rem;">
+                                        <tr>
+                                            <td class="font-weight-bold">Proveedor({{idx+1}})&nbsp;<span data-toggle="tooltip" title="Buscar Proveedor"><i class="fa fa-search pointerHand" style="color:rgb(30, 30, 180)" (click)="handleSearchProveedor(item)"></i></span></td>
+                                            <td><input placeholder="RUC" type="text" [(ngModel)]="item.supplier_ruc"></td>
+                                            <td><input placeholder="Razon Social" type="text" [(ngModel)]="item.supplier_name"></td>
+                                        </tr>
+                                        <tr style="font-size: 0.58rem;">
+                                            <td class="text-left">Moneda</td>
+                                            <td class="text-center">P.U.</td>
+                                            <td class="text-center">TOTAL</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <select [(ngModel)]="item.coin">
+                                                    <option [value]="item.name" *ngFor="let item of tipoMoneda;"> {{ item.name }}</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="text" [(ngModel)]="item.unit_price" placeholder="Price unit" (blur)="getTotal(item)"></td>
+                                            <td class="font-weigth-bold text-center" [ngStyle]="{'color': (item.status)?'red':'#333333'}">{{item.total | number:'.2-2'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <hr style="padding-top: 0.2rem;padding-bottom: 0.18rem;">
+                                <div style="font-size:0.7rem">
+                                    <table style="width:100%;" id="tabletest">
+                                        <tr *ngFor="let detail of item.lista_detalle">
+                                            <td>
+                                                <span class="badge" tabindex="0" data-toggle="tooltip" [title]="detail.type" [ngClass]="{'badge-primary': (detail.type==='Comercial'),'badge-success': (detail.type==='Tecnica')}">
+                                                    {{detail.type | slice: 0:1}}
+                                                </span>
+                                            </td>
+                                            <td style="font-size: 0.65rem;">{{detail.name}}</td>
+                                            <td style="width: 6.5rem">
+                                                <select style="width: 6.5rem;padding: 0.1rem 0rem;" *ngIf="(detail.options.length>0)" [(ngModel)]="detail.description" (ngModelChange)="changeItemDetail(detail)">
+                                                    <option [value]="opt.name" *ngFor="let opt of detail.options;"> {{ opt.name }}</option>
+                                                </select>
+                                                <input style="width: 6.5rem;" *ngIf="(detail.options.length==0)" type="text" [(ngModel)]="detail.description" (blur)="changeItemDetail(detail)">
+                                            </td>
+                                            <td style="width: 3rem">
+                                                <input type="text" [(ngModel)]="detail.value" (ngModelChange)="getAverage(item)">
+                                            </td>
+                                            <td>%</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-right">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <td class="text-left">
+                                            <small style="font-size:0.8rem" class="font-weight-bold badge" [ngClass]="{'badge-success': (item.status),'badge-light': (!item.status)}">{{minValueEstimated/item.total | percent:'.1-1'}}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <button (click)="deleteItemEval(item)" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Quitar Evaluacion" style="font-size:0.4rem;padding:0.35rem !important;">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </td>
+                                        <td class="text-right">
+                                            <small class="font-weight-bold" style="font-size:0.8rem;color:#196da9">{{item.avg_estimated | number:'.2-2'}}%</small>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">
+                    Cancelar
+                </button>
+                <button [disabled]="(dataEvaluacion.length===0)" type="button" class="btn btn-info btn-sm" (click)="printEvaluation()">
+                    <i class="fa fa-print"></i> Imprimir
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="saveEvaluation()">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+
+        <!-- EVALUACION - READ -->
+        <div class="tab-pane fade" id="evalsecomread">
+            <div class="flecha">
+                <div class="row">
+                    <div class="col-md-1">
+                        <span style="margin-right: 1rem;" class="badge  badge-primary text-wrap"> UND: {{ itemEdit.cantidad }}</span>
+                    </div>
+                    <div class="col-md-5">
+                        {{itemEdit.descripcion}}
+                    </div>
+                    <div class="col-md-4">
+                        <table>
+                            <tr>
+                                <td><span style="font-size: 0.68rem;">CUADRO&nbsp;COMPARATIVO&nbsp;N°</span></td>
+                                <td><input style="font-weight: bold;" readonly type="text" [(value)]="codigo_eval"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-y: auto;max-height: 60vh;">
+                <div class="row no-gutters">
+                    <div class="col-md-4" style="padding:0.3rem 0.4rem" *ngFor="let item of dataEvaluacion; let idx = index">
+                        <div class="simplecard" [ngStyle]="{'background': (item.status)?'#d0ecd0':'#eaf5f5', 'border': (item.status)?'#4dbb5b 2px solid':'rgb(90, 150, 158) 2px solid'}">
+                            <div class="">
+                                <table>
+                                    <tbody style="font-size: 0.7rem;">
+                                        <tr>
+                                            <td class="font-weight-bold">Proveedor({{idx+1}})&nbsp;</td>
+                                            <td><input placeholder="RUC" type="text" readonly [(value)]="item.supplier_ruc"></td>
+                                            <td><input placeholder="Razon Social" type="text" readonly [(value)]="item.supplier_name"></td>
+                                        </tr>
+                                        <tr style="font-size: 0.58rem;">
+                                            <td class="text-left">Moneda</td>
+                                            <td class="text-center">P.U.</td>
+                                            <td class="text-center">TOTAL</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{ item.coin }}</td>
+                                            <td>{{ item.unit_price}}</td>
+                                            <td class="font-weigth-bold text-center" [ngStyle]="{'color': (item.status)?'red':'#333333'}">{{item.total | number:'.2-2'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <hr style="padding-top: 0.2rem;padding-bottom: 0.18rem;">
+                                <div style="font-size:0.7rem">
+                                    <table style="width:100%;" id="tabletest">
+                                        <tr *ngFor="let detail of item.lista_detalle">
+                                            <td>
+                                                <span class="badge" tabindex="0" data-toggle="tooltip" [title]="detail.type" [ngClass]="{'badge-primary': (detail.type==='Comercial'),'badge-success': (detail.type==='Tecnica')}">
+                                                    {{detail.type | slice: 0:1}}
+                                                </span>
+                                            </td>
+                                            <td style="font-size: 0.65rem;">{{detail.name}}</td>
+                                            <td style="width: 6.5rem"><input type="text" [(value)]="detail.description" readonly></td>
+                                            <td style="width: 3rem"><input type="text" [(value)]="detail.value" readonly></td>
+                                            <td>%</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-right">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <td class="text-left">
+                                            <small style="font-size:0.8rem" class="font-weight-bold badge" [ngClass]="{'badge-success': (item.status),'badge-light': (!item.status)}">{{minValueEstimated/item.total | percent:'.1-1'}}</small>
+                                        </td>
+                                        <td class="text-right">
+                                            <small class="font-weight-bold" style="font-size:0.8rem;color:#196da9">{{item.avg_estimated | number:'.2-2'}}%</small>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">
+                    Cancelar
+                </button>
+                <button [disabled]="(dataEvaluacion.length===0)" type="button" class="btn btn-info btn-sm" (click)="printEvaluation()">
+                    <i class="fa fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<!-- EVALUACION DE PROVEEDOR -->
+<p-dialog [(visible)]="displayEvaluation" positionTop="50" [contentStyle]="{'width':'90vw'}" modal="true">
+    <p-header>Evaluación de Proveedor</p-header>
+    <div class="flecha">
+        <div class="row">
+            <div class="col-md-8">
+                <table>
+                    <tr>
+                        <td><span style="font-size: 0.68rem;">CUADRO&nbsp;COMPARATIVO&nbsp;N°</span></td>
+                        <td><input style="font-weight: bold;" type="text" [(ngModel)]="codigo_eval" (blur)="changeCodigoEval(codigo_eval)"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-4 Block">
+                <div class="btn-group my-auto" role="group">
+                    <span style="font-size:0.6rem; padding-top:0.2rem;padding-right:0.1rem;">Añadir Evaluación</span>
+                    <button style="font-size: 0.7rem" type="button" class="" (click)="addItemEval()" data-toggle="tooltip" data-placement="bottom" title="Crear evaluacion vacia">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <button style="font-size: 0.7rem" type="button" (click)="displayUploadFile=true" data-toggle="tooltip" data-placement="bottom" title="Subir Archivo">
+                        <i class="fa fa-upload"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mx-5 text-center" style="max-height: 10rem;overflow: auto;">
+        <table cellspacing="0" cellpadding="1" style="font-size: 0.7rem;">
+            <tbody>
+                <tr *ngFor="let itemSelect of dataCheckSelected">
+                    <td>
+                        <span class="badge badge-primary badge-pill">{{ itemSelect.cantidad }}</span>
+                    </td>
+                    <td class="text-left pl-5">{{ (itemSelect.prod_code) ? '[' + itemSelect.prod_code + '] ' + itemSelect.prod_name : itemSelect.prod_name }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="overflow-y: auto;max-height: 60vh;">
+        <div class="row no-gutters">
+            <div class="col-md-4" style="padding:0.3rem 0.4rem" *ngFor="let item of dataEvaluacion; let idx = index">
+                <div class="simplecard" [ngStyle]="{'background': (item.status)?'#d0ecd0':'#eaf5f5', 'border': (item.status)?'#4dbb5b 2px solid':'rgb(90, 150, 158) 2px solid'}">
+                    <div class="">
+                        <table>
+                            <tbody style="font-size: 0.7rem;">
+                                <tr>
+                                    <td class="font-weight-bold">Proveedor({{idx+1}})&nbsp;<span data-toggle="tooltip" title="Buscar Proveedor"><i class="fa fa-search pointerHand" style="color:rgb(30, 30, 180)" (click)="handleSearchProveedor(item)"></i></span></td>
+                                    <td><input placeholder="RUC" type="text" [(ngModel)]="item.supplier_ruc"></td>
+                                    <td><input placeholder="Razon Social" type="text" [(ngModel)]="item.supplier_name"></td>
+                                </tr>
+                                <tr style="font-size: 0.58rem;">
+                                    <td class="text-left">Moneda</td>
+                                    <td class="text-center">P.U.</td>
+                                    <td class="text-center">TOTAL</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <select [(ngModel)]="item.coin">
+                                            <option [value]="item.name" *ngFor="let item of tipoMoneda;"> {{ item.name }}</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="text" [(ngModel)]="item.unit_price" placeholder="Price unit" (blur)="getTotal(item)"></td>
+                                    <td class="font-weigth-bold text-center" [ngStyle]="{'color': (item.status)?'red':'#333333'}">{{item.total | number:'.2-2'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr style="padding-top: 0.2rem;padding-bottom: 0.18rem;">
+                        <div style="font-size:0.7rem">
+                            <table style="width:100%;" id="tabletest">
+                                <tr *ngFor="let detail of item.lista_detalle">
+                                    <td>
+                                        <span class="badge" tabindex="0" data-toggle="tooltip" [title]="detail.type" [ngClass]="{'badge-primary': (detail.type==='Comercial'),'badge-success': (detail.type==='Tecnica')}">
+                                            {{detail.type | slice: 0:1}}
+                                        </span>
+                                    </td>
+                                    <td style="font-size: 0.65rem;">{{detail.name}}</td>
+                                    <td style="width: 6.5rem">
+                                        <select style="width: 6.5rem;padding: 0.1rem 0rem;" *ngIf="(detail.options.length>0)" [(ngModel)]="detail.description" (ngModelChange)="changeItemDetail(detail)">
+                                            <option [value]="opt.name" *ngFor="let opt of detail.options;"> {{ opt.name }}</option>
+                                        </select>
+                                        <input style="width: 6.5rem;" *ngIf="(detail.options.length==0)" type="text" [(ngModel)]="detail.description" (blur)="changeItemDetail(detail)">
+                                        <!-- <input type="text" [(ngModel)]="detail.description" (blur)="changeItemDetail(detail)"> -->
+                                    </td>
+                                    <td style="width: 3rem">
+                                        <input type="text" [(ngModel)]="detail.value" (ngModelChange)="getAverage(item)">
+                                    </td>
+                                    <td>%</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-right">
+                        <table style="width:100%;">
+                            <tr>
+                                <td class="text-left">
+                                    <small style="font-size:0.8rem" class="font-weight-bold badge" [ngClass]="{'badge-success': (item.status),'badge-light': (!item.status)}">{{minValueEstimated/item.total | percent:'.1-1'}}</small>
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="deleteItemEval(item)" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Quitar Evaluacion" style="font-size:0.4rem;padding:0.35rem !important;">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                                <td class="text-right">
+                                    <small class="font-weight-bold" style="font-size:0.8rem;color:#196da9">{{item.avg_estimated | number:'.2-2'}}%</small>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">
+            Cancelar
+        </button>
+        <button [disabled]="(dataEvaluacion.length===0)" type="button" class="btn btn-info btn-sm" (click)="printEvaluation()">
+            <i class="fa fa-print"></i> Imprimir
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="saveEvaluation()">
+            <i class="fa fa-save"></i> Guardar
+        </button>
+    </div>
+</p-dialog>
+
+<!-- ENVIAR CORREO -->
+<p-dialog [(visible)]="displaySendEmail" positionTop="50" [contentStyle]="{'max-width':'75rem', 'min-width': '50rem'}" modal="true">
+    <p-header>
+        Enviar Correo
+    </p-header>
+    <form [formGroup]="formEmail" style="margin-bottom:0px" (ngSubmit)="SendMail()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-3 d-flex justify-content-center align-items-center">
+                    <button class="btn btn-outline-primary" [disabled]="!formEmail.valid" type="submit">
+                        <i class="far fa-envelope fa-4x"></i><br>
+                        Enviar
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Para" formControlName="to">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="CC" formControlName="cc">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Asunto" formControlName="subject">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-auto">
+            <!-- <app-ngx-editor [placeholder]="'Enter text here...'" [spellcheck]="true" formControlName="html"></app-ngx-editor> -->
+            <mat-form-field>
+                <mat-label>Mensaje</mat-label>
+                <textarea formControlName="html" matInput cdkTextareaAutosize cdkAutosizeMinRows="10" cdkAutosizeMaxRows="20">
+                    </textarea>
+            </mat-form-field>
+        </div>
+    </form>
+</p-dialog>
+
+<!-- IMPRIMIR GUIA -->
+<p-dialog [(visible)]="displayPrint" positionTop="50" [contentStyle]="{'width': '80vw'}" modal="true">
+    <p-header>
+        Gererar Guia
+    </p-header>
+    <form [formGroup]="formPrint" style="margin-bottom:0px;font-size: 0.8rem;" (ngSubmit)="saveGuia(formPrint.value, dataPrint)">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha Inicio Translado" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Destinatario" formControlName="receiver">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Punto de Partida" formControlName="starting_point">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Punto de Llegada" formControlName="arrival_point">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-1">
+                    <button mat-raised-button type="submit" matTooltip="Guardar Guia" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm">
+                        <i class="fas fa-save"></i> Guardar
+                        <div class="ripple-container"></div>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="RUC o Doc de Ident." formControlName="doc_identify">
+                    </mat-form-field>
+                </div>
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Factura N°" formControlName="number_invoice">
+                    </mat-form-field>
+                </div>
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="N° GRR" formControlName="number_guide">
+                        <mat-error *ngIf="formPrint.controls['number_guide'].invalid">
+                            El N° de Guia es <strong>Obligatorio</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <span>Transportista</span><br>
+            <div class="row">
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Transportista" formControlName="carrier_name">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="RUC" formControlName="carrier_ruc">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Marca vehículo" formControlName="vehicle_mark">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Placa N°" formControlName="plate_number">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Constancia de Inscrip." formControlName="constancy_ins">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="N° Licencia Cond." formControlName="license_number">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="tableFixHead" style="max-height: 40vh !important;">
+        <table class="table table-hover table-sm table-bordered" style="font-size: 0.6rem;">
+            <thead>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">Descripción</th>
+                <th scope="col" class="text-center">Unidad</th>
+                <th scope="col" class="text-center">Cantidad</th>
+                <th scope="col" class="text-center">N° PO</th>
+                <th scope="col" class="text-center">N° Licitación</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of dataPrint; let i = index" class="clickable-row pointerHand">
+                    <td class="text-center" scope="row">{{(i+1)}}</td>
+                    <td style="width: 45%"><input type="text" [(ngModel)]="item.description"></td>
+                    <td style="width: 15%"><input type="text" [(ngModel)]="item.unit"></td>
+                    <td style="width: 12%"><input type="text" [(ngModel)]="item.qty"></td>
+                    <td style="width: 14%"><input type="text" [(ngModel)]="item.purchase_order"></td>
+                    <td style="width: 14%"><input type="text" [(ngModel)]="item.number_lic"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</p-dialog>
+
+<p-dialog [(visible)]="displaySearchSupp" positionTop="50" [contentStyle]="{'max-width':'50rem', 'min-width': '20rem'}" modal="true">
+    <p-header>
+        Buscar Proveedor
+    </p-header>
+    <form [formGroup]="formSearchSupp" style="margin-bottom:0px" (ngSubmit)="searchProveedor()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-5">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="RUC" formControlName="number">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Razon Social" formControlName="name">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-1">
+                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                        <i class="fa fa-search"></i>
+                        <div class="ripple-container"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-auto">
+            <div class="tableFixHead">
+                <table class="table table-hover" style="font-size:0.68rem">
+                    <thead class="text-info">
+                        <th class="text-center" scope="col">#</th>
+                        <th scope="col">Ruc</th>
+                        <th scope="col">Razon Social</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of dataSuppliers; let i = index" class="clickable-row pointerHand" (click)="getProveedor(item)">
+                            <td class="text-center" scope="row">{{(i+1)}}</td>
+                            <td>{{ item.type_number }}</td>
+                            <td>{{ item.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog [(visible)]="displayUploadFile" positionTop="50" [contentStyle]="{'max-width':'40rem', 'min-width': '17rem'}" modal="true">
+    <p-header>
+        Subir Archivo - CSV
+    </p-header>
+    <div>
+        <label id="lbl">Seleccionar archivo en formato CSV</label>
+        <div class="Block" style="font-size: 0.8rem;">
+            <!-- <label id="lbl" style="padding-right: 1rem;">Subir Archivo CSV </label> -->
+            <input type='file' (change)="fileChanged($event)" accept=" .csv">
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayUploadFile=false">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="uploadDocument()">
+            <i class="fa fa-upload"></i> Cargar
+        </button>
+    </div>
+</p-dialog>
+
+<p-dialog [(visible)]="displayDetailGuide" positionTop="50" [contentStyle]="{'width': '90vw'}" modal="true" (onHide)="closeDetailGuia()">
+    <p-header>
+        Detalle - Guia
+    </p-header>
+    <div *ngIf="idDetailGuia">
+        <app-detail-guide [id_guide]="idDetailGuia"></app-detail-guide>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-outline-danger btn-sm" (click)="closeDetailGuia()">
+            Cerrar
+        </button>
+    </div>
+</p-dialog>

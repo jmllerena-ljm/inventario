@@ -1,0 +1,250 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col">
+                        <h4 class="card-title">PEDIDOS DE COMPRA</h4>
+                        <p class="card-category">Impresion de Guias</p>
+                    </div>
+                    <div class="col">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchPedidosCompra()">
+                            <div class="input-group no-border">
+                                <input type="date" formControlName="date_ini" class="form-control colorPlaceholder mx-2" placeholder="Fecha Ini...">
+                                <input type="date" formControlName="date_fin" class="form-control colorPlaceholder mx-2" placeholder="Fecha Fin...">
+                                <input type="search" formControlName="name" class="form-control colorPlaceholder mx-2" placeholder="N° PO...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                <i class="fa fa-search"></i>
+                                <div class="ripple-container"></div>
+                            </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th scope="col">N° PO</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Fecha Aprobacion</th>
+                            <th class="text-center" scope="col">Estado</th>
+                            <th class="text-center" scope="col">Estado Factura</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="getDetallePedidoCompra(item)">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td>
+                                    <span style="font-weight:bold;color:#0164b0">{{ item.name }}</span>
+                                </td>
+                                <td>{{ item.date_order | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ item.date_approve | date: 'dd/MM/yyyy' }}</td>
+                                <td class="text-center">{{ item.state | uppercase }}</td>
+                                <td class="text-center">{{ item.invoice_status | uppercase }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-right">
+                    <i><small>Total de Ordenes de Compra: <b>{{ gridData.length }}</b></small></i>
+                </div>
+                <div *ngIf="dataCheckSelected.length > 0">
+                    <table class="mat-elevation-z8" style="font-size:0.6rem;width: 100%;">
+                        <thead class="pointerHand">
+                            <th colspan="3" scope="col" (click)="explandSelectedItems = !explandSelectedItems" style="padding: 0.8rem 1rem;font-size: 0.7rem;color:#0269b9;">
+                                <i class="fas fa-clipboard-check"></i> Items Seleccionados
+                                <span class="tag-primary">{{dataCheckSelected.length}}</span>
+
+                                <button class="btn btn-info btn-sm ml-5" (click)="handleImprimirGuia()">
+                                  <i class="fas fa-print"></i> 
+                                  Imprimir Guia
+                                </button>
+
+                                <i [ngClass]="{'fa-chevron-up': explandSelectedItems, 'fa-chevron-down': !explandSelectedItems}" class="fas" style="float:right"></i>
+                            </th>
+                        </thead>
+                        <tbody class="animated fadeIn fast" *ngIf="explandSelectedItems">
+                            <tr *ngFor="let item of dataCheckSelected; let i = index" class="clickable-row">
+                                <td style="padding-left: 1rem;">{{ item.name }}</td>
+                                <!--[{{ item.product_code }}]&nbsp;{{ item.product_name }}-->
+                                <td class="text-center">{{ item.po_name }}</td>
+                                <td class="text-right">
+                                    <button mat-icon-button color="accent" (click)="deleteSelectedItem(item)" aria-label="Example icon button with a menu icon">
+                                      <i class="fa fa-trash"></i>
+                                  </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETALLE DEL PEDIDO DE COMPRA -->
+<p-dialog [(visible)]="displayDetail" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Detalle - Pedido de Compra
+    </p-header>
+    <div style="padding:5px">
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field class="mx-2">
+                    <input matInput type="text" readonly placeholder="N° PO" name="name_po" [value]="itemEdit?.name">
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field class="mx-2">
+                    <input matInput type="date" readonly placeholder="Fecha PO" name="date_order" [value]="itemEdit?.date_order">
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <table class="table table-hover" style="font-size:0.68rem">
+                <thead class="text-info">
+                    <th scope="col" class="text-center" *ngIf="accessLevel.NivelAcceso">
+                        <mat-checkbox (change)="changeCheckGeneral()" [(ngModel)]="checkGeneral"></mat-checkbox>
+                    </th>
+                    <th class="text-center" scope="col">#</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Cantidad</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of detailData; let i = index" class="clickable-row">
+                        <td class="text-center" *ngIf="accessLevel.NivelAcceso">
+                            <mat-checkbox [(ngModel)]="item.check_det" (change)="changeCheckItem(item)"></mat-checkbox>
+                        </td>
+                        <td class="text-center" scope="row">{{(i+1)}}</td>
+                        <td>[{{ item.product_code }}]&nbsp;{{ item.product_name }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.product_qty | number:'.2-3' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p-footer class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayDetail=false">Cerrar</button>
+    </p-footer>
+</p-dialog>
+
+<!-- IMPRIMIR GUIA -->
+<p-dialog [(visible)]="displayPrint" positionTop="50" [contentStyle]="{'max-width':'65rem', 'min-width': '60rem'}" modal="true">
+    <p-header>
+        Configurar Guia
+    </p-header>
+    <form [formGroup]="formPrint" style="margin-bottom:0px;font-size: 0.8rem;" (ngSubmit)="imprimirGuia()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha Inicio Translado" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Destinatario" formControlName="receiver">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Punto de Partida" formControlName="starting_point">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Punto de Llegada" formControlName="arrival_point">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-1">
+                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                      <i class="fas fa-file-pdf"></i>
+                      <div class="ripple-container"></div>
+                  </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="RUC o Doc de Ident." formControlName="doc_identify">
+                    </mat-form-field>
+                </div>
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Factura N°" formControlName="number_invoice">
+                    </mat-form-field>
+                </div>
+                <div class="col">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="N° GRR" formControlName="number_guide">
+                        <mat-error *ngIf="formPrint.controls['number_guide'].invalid">
+                            El N° de Guia es <strong>Obligatorio</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <span>Transportista</span><br>
+            <div class="row">
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Transportista" formControlName="carrier_name">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="RUC" formControlName="carrier_ruc">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Marca vehículo" formControlName="vehicle_mark">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Placa N°" formControlName="plate_number">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Constancia de Inscrip." formControlName="constancy_ins">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="N° Licencia Cond." formControlName="license_number">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div *ngIf="dataCheckSelected.length > 29" class="alert alert-warning text-center" role="alert">
+        <i class="fas fa-exclamation-triangle"></i> Solo se imprimiran los primeros <b>29</b> items seleccionados
+    </div>
+    <div class="tableFixHead" style="max-height: 40vh !important;">
+        <table class="table table-hover table-sm table-bordered" style="font-size: 0.6rem;">
+            <thead>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">Descripción</th>
+                <th scope="col" class="text-center">Unidad</th>
+                <th scope="col" class="text-center">Cantidad</th>
+                <th scope="col" class="text-center">N° PO</th>
+                <th scope="col" class="text-center">N° Licitación</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of dataPrint; let i = index" class="clickable-row pointerHand">
+                    <td class="text-center" scope="row">{{(i+1)}}</td>
+                    <td style="width: 45%"><input type="text" style="width:100%" [(ngModel)]="item.description"></td>
+                    <td style="width: 15%"><input type="text" [(ngModel)]="item.unit"></td>
+                    <td style="width: 12%"><input type="text" [(ngModel)]="item.qty"></td>
+                    <td style="width: 14%"><input type="text" [(ngModel)]="item.purchase_order"></td>
+                    <td style="width: 14%"><input type="text" [(ngModel)]="item.number_lic"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</p-dialog>

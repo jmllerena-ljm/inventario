@@ -1,0 +1,9 @@
+.flecha {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #052e4c;
+    margin: 0.3rem 0.85rem;
+    padding: 0.45rem 1rem;
+    background-color: #a5e8a5;
+    border: #3a9823 1px solid;
+}

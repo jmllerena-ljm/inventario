@@ -1,0 +1,277 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 class="card-title">REPOSICIONES</h4>
+                        <p class="card-category">Reposiciones de Productos</p>
+                    </div>
+                    <div class="col-md-9 text-right">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchAlmacen()">
+                            <div class="row" style="margin-right: 0.5rem;">
+                                <div class="col-md-6">
+                                    Ordenar por:&nbsp;
+                                    <select formControlName="columnSort">
+                                        <option [value]="item.value" *ngFor="let item of selectOrderBy;">{{ item.name }}</option>
+                                    </select>
+                                    <i *ngIf="check_asc" class="fa fa-sort-alpha-down text-button" v-model="check_asc" (click)="check_asc=!check_asc"></i>
+                                    <i *ngIf="!check_asc" class="fa fa-sort-alpha-up text-button" v-model="check_asc" (click)="check_asc=!check_asc"></i>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    Compañia:&nbsp;
+                                    <select formControlName="company" (change)="searchAlmacen()">
+                                        <option [value]="item._id" *ngFor="let item of dataCompany;">{{ item.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 col-6">
+                                    <select class="form-control form-control-sm" formControlName="color" clearable>
+                                        <option value="" selected>Select color</option>
+                                        <option [value]="item.value" *ngFor="let item of selectColor;">{{ item.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <mat-form-field class="colorPlaceholder">
+                                        <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Tipo" formControlName="group">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <mat-form-field class="colorPlaceholder">
+                                        <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Codigo" formControlName="code">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <mat-form-field class="colorPlaceholder">
+                                        <input class="colorPlaceholder mx-2" type="search" matInput placeholder="Nombre" formControlName="name">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-1">
+                                    <button mat-raised-button type="submit" matTooltip="Buscar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                        <i class="fa fa-search"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.68rem">
+                        <thead class="text-info">
+                            <th scope="col" class="text-center" *ngIf="accessLevel.NivelAcceso">
+                                <mat-checkbox (change)="changeCheckGeneral()" [(ngModel)]="checkGeneral" [checked]="checkGeneral"></mat-checkbox>
+                            </th>
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">Codigo</th>
+                            <th scope="col">Nombre</th>
+                            <th class="text-center" scope="col">Und</th>
+                            <th class="text-center" scope="col">Tipo</th>
+                            <th class="text-center" scope="col">Estado</th>
+                            <th class="text-center" scope="col">Stock Seg.</th>
+                            <th class="text-center" scope="col">Stock Min.</th>
+                            <th class="text-center" scope="col">Stock Max.</th>
+                            <th class="text-center" scope="col">Stock Actual</th>
+                            <!-- <th class="text-center" scope="col">Ult.Licitación</th> -->
+                            <th scope="col" *ngIf="accessLevel.NivelAcceso">Editar</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row">
+                                <td class="text-center" *ngIf="accessLevel.NivelAcceso">
+                                    <mat-checkbox [(ngModel)]="item.check" [checked]="item.check"></mat-checkbox>
+                                </td>
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td style="width: 9rem;cursor: pointer" (click)="handleClick(item)">
+                                    <span style="color:rgb(30, 76, 163)"><u>{{ item.code }}</u></span>
+                                </td>
+                                <td>{{ item.name }}</td>
+                                <td class="text-center">{{ item.umed | uppercase }}</td>
+                                <td>{{ item.group }}</td>
+                                <td class="text-center"><i class="fas fa-circle fa-2x" [ngStyle]="{'color': item.color}"></i></td>
+                                <td class="text-right">{{ item.stock_security | number:'.3-3' }}</td>
+                                <td class="text-right">{{ item.stock_min | number:'.3-3' }}</td>
+                                <td class="text-right">{{ item.stock_max | number:'.3-3' }}</td>
+                                <td class="text-right">
+                                    <span style="font-weight:bold;color:#3e3e86">{{ item.stock_now | number:'.3-3' }}</span>
+                                </td>
+                                <!-- <td class="text-center">{{ item.lic_number }}</td> -->
+                                <td class="td-actions text-right" style="width: 4em" *ngIf="accessLevel.NivelAcceso">
+                                    <button mat-raised-button type="button" matTooltip="Editar" [matTooltipPosition]="'below'" matTooltipShowDelay="1000" class="btn btn-success btn-round btn-sm btn-link btn-just-icon" (click)="handleEdit(item)">
+                                        <i class="fa fa-edit"></i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success btn-sm" (click)="exportAsXLSX()">
+                            <i class="fas fa-cloud-download-alt"></i> 
+                            Exportar Excel
+                        </button>
+                        <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleSendMail()">
+                            <i class="far fa-envelope"></i> 
+                            Solicitar Reposición
+                        </button>
+                    </div>
+                    <div class="col">
+                        Total: <b>{{ gridData.length }}</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDITAR ALMACEN -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'800px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Almacen
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateAlmacen()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="form-group">
+                        <input type="text" Readonly formControlName="name" class="form-control-plaintext" style="font-size: 1.5em" placeholder="Código">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Unidad de Medida" formControlName="umed">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-8">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="text" placeholder="Grupo / Tipo Producto" formControlName="group">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <i class="fa fa-clipboard-list fa-7x"></i>
+                </div>
+                <div class="col-md-8">
+
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Stock de Seguridad" formControlName="stock_security">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Stock Minimo" formControlName="stock_min">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput type="number" placeholder="Stock Maximo" formControlName="stock_max">
+                    </mat-form-field>
+                    <div class="row">
+                        <div class="col-sm-3" style="margin-left:10px">Tipo:</div>
+                        <div class="col-md-8">
+                            <select class="form-control form-control-sm" formControlName="type">
+                                <option [value]="item.value" *ngFor="let item of selectType;"> {{ item.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- DETALLE ITEM ALMACEN -->
+<p-dialog [(visible)]="displayDetalle" positionTop="50" [contentStyle]="{'max-width':'1000px', 'min-width': '750px'}" modal="true">
+    <p-header>
+        Detalle - Producto
+    </p-header>
+    <div style="padding:5px">
+        <div>Última Licitación: <span class="badge  badge-info text-wrap">{{ ultimaLicitacion }}</span></div>
+        <div>
+            <table class="table table-hover" style="font-size:0.68rem">
+                <thead class="text-info">
+                    <th class="text-center" scope="col">#</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col" class="text-center">Tipo</th>
+                    <th scope="col">Código</th>
+                    <th scope="col" class="text-center">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio Unit.</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of detalleProducto; let i = index" class="clickable-row">
+                        <td class="text-center" scope="row">{{(i+1)}}</td>
+                        <td>{{ item.date | date: 'dd-MM-yyyy' }}</td>
+                        <td class="text-center">
+                            <span style="font-size:0.7rem" class="badge text-wrap" [ngClass]="{'badge-primary': (item.entrada.type!='IN'), 'badge-success': (item.entrada.type=='IN')}">
+                                {{ (item.entrada.type=='IN')? 'Entrada':'Salida' }}
+                            </span>
+                        </td>
+                        <td>{{ item.code }}</td>
+                        <td>{{ item.name }}</td>
+                        <td class="text-right">{{ item.product_qty | number:'.2-3' }}</td>
+                        <td class="text-right">{{ item.price_unit | number:'.2-2' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" style="height:30px;line-height:30px;background-color:rgb(201, 200, 200)">
+            <div class="col text-left font-weight-bold">
+                Total
+            </div>
+            <div class="col text-right">
+                <span>Entradas: <b>{{ SumData(detalleProducto, 'IN') | number:'.2-2' }}</b></span>
+                <span style="padding-left:3rem">Salidas: <b>{{ SumData(detalleProducto, 'OUT') | number:'.2-2' }}</b></span>
+            </div>
+        </div>
+    </div>
+    <p-footer class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="displayDetalle=false">Cancelar</button>
+    </p-footer>
+</p-dialog>
+
+<!-- ENVIAR CORREO -->
+<p-dialog [(visible)]="displaySendEmail" positionTop="50" [contentStyle]="{'max-width':'65rem', 'min-width': '60rem'}" modal="true">
+    <p-header>
+        Enviar Correo
+    </p-header>
+    <form [formGroup]="formEmail" style="margin-bottom:0px" (ngSubmit)="SendMail()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-3 d-flex justify-content-center align-items-center">
+                    <button class="btn btn-outline-primary" [disabled]="!formEmail.valid" type="submit">
+                        <i class="far fa-envelope fa-4x"></i><br>
+                        Enviar
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Para" formControlName="to">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="CC" formControlName="cc">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Asunto" formControlName="subject">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-auto">
+            <!-- <app-ngx-editor [placeholder]="'Enter text here...'" [spellcheck]="true" formControlName="html"></app-ngx-editor> -->
+            <!-- <p-editor formControlName="html"></p-editor> -->
+            <mat-form-field>
+                <mat-label>Mensaje</mat-label>
+                <textarea formControlName="html" matInput cdkTextareaAutosize cdkAutosizeMinRows="10" cdkAutosizeMaxRows="20">
+                </textarea>
+            </mat-form-field>
+        </div>
+    </form>
+</p-dialog>

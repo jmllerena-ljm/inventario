@@ -1,0 +1,283 @@
+<div class="main-content animated fadeIn">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <div class="row">
+                    <div class="col-lg-5 col-md-5 col-12">
+                        <h4 class="card-title">Registro de Documentos
+                            <button *ngIf="accessLevel.NivelAcceso" class="btn btn-primary btn-sm" (click)="handleAdd()">Crear</button>
+                        </h4>
+                        <p class="card-category">Control de Documentos</p>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-12">
+                        <form class="form-signin" [formGroup]="formSearch" (ngSubmit)="searchDocsRegister()">
+                            <div class="input-group no-border">
+                                <input type="date" formControlName="date_ini" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Fecha Inicial...">
+                                <input type="date" formControlName="date_fin" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Fecha Final...">
+                                <input type="search" formControlName="issue" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Asunto...">
+                                <button mat-raised-button type="submit" class="btn btn-primary btn-sm btn-round btn-just-icon">
+                                    <i class="fa fa-search"></i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+                            <div class="input-group no-border">
+                                <input type="search" formControlName="sender" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Remitente...">
+                                <input type="search" formControlName="doc_type" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Tipo Doc...">
+                                <input type="search" formControlName="reference" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Referencia...">
+                                <input type="search" formControlName="area" class="form-control form-control-sm colorPlaceholder mx-2" placeholder="Área...">
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tableFixHead">
+                    <table class="table table-hover" style="font-size:0.72rem">
+                        <thead class="text-info">
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">N° Doc</th>
+                            <th class="text-center" scope="col">Fecha</th>
+                            <th scope="col">Remitente</th>
+                            <th scope="col">Tipo Doc.</th>
+                            <th scope="col">Asunto</th>
+                            <th scope="col">Referencia</th>
+                            <th scope="col">Area Distribución</th>
+                            <th scope="col">Observaciones</th>
+                            <th class="text-center" scope="col">-</th>
+                            <th class="text-center" scope="col">Estado</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of gridData; let i = index" class="clickable-row pointerHand" (click)="handleEdit(item)" [ngStyle]="{'color': (item.state=='borrador')?'red': 'black'}">
+                                <td class="text-center" scope="row">{{(i+1)}}</td>
+                                <td class="text-center">{{ item.code }}</td>
+                                <td class="text-center">{{ item.date | date: 'dd/MM/yyyy HH:mm' }}</td>
+                                <td>{{ item.sender }}</td>
+                                <td>{{ item.doc_type }}</td>
+                                <td>{{ item.issue }}</td>
+                                <td>{{ item.reference }}</td>
+                                <td>{{ item.area }}</td>
+                                <td>{{ item.observations }}</td>
+                                <td>{{ item.other_data }}</td>
+                                <td>{{ item.state | uppercase }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <mat-paginator [length]="countData" [pageSize]="50" [pageSizeOptions]="[50, 100, 1000]" (page)="handlePage($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGREGAR DOCUMENTO -->
+<p-dialog [(visible)]="displayAdd" positionTop="50" [contentStyle]="{'max-width':'1200px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Registrar nuevo Documento
+    </p-header>
+    <form [formGroup]="formAdd" style="margin-bottom:0px" (ngSubmit)="saveDocRegister()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-6 col-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput type="date" placeholder="Fecha" formControlName="date">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6 col-6">
+                    <mat-form-field>
+                        <mat-label>Origen</mat-label>
+                        <select matNativeControl formControlName="other_data">
+                            <option [ngValue]="''" [disabled]="true" >Seleccionar Origen</option>
+                            <option [value]="item.value" *ngFor="let item of dataOrigen;" style="margin-left:10px;">{{ item.value }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 px-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="issue" type="text" placeholder="Asunto" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6 px-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="sender" type="text" placeholder="Remitente" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 px-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="area" type="text" placeholder="Area Distribución" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 px-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="doc_type" type="text" placeholder="Tipo de Documento" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 px-2">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="reference" type="text" placeholder="Referencia" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 px-2">
+                    <mat-form-field class="mx-2">
+                        <textarea matInput formControlName="observations" type="text" placeholder="Observaciones" autocomplete="off"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+            <p>
+                <label for="" class="text-muted" style="font-size: 0.7rem;">Adjuntar Archivo</label>
+                <input #fileInputAdd class="btn btn-success btn-sm btn-block" type="file" placeholder="Seleccionar archivo..." (change)="fileChangeEvent($event)">
+            </p>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayAdd=false">Cancelar</button>
+            <button [disabled]="!formAdd.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- EDITAR DOCUMENTO -->
+<p-dialog [(visible)]="displayEdit" positionTop="50" [contentStyle]="{'max-width':'1200px', 'min-width': '600px'}" modal="true">
+    <p-header>
+        Editar - Documento N° {{itemEdit.code}}
+    </p-header>
+    <form [formGroup]="formEdit" style="margin-bottom:0px" (ngSubmit)="updateDocRegister()">
+        <div style="padding:5px">
+            <div class="row" style="font-size: 0.75rem;">
+                <div class="col-md-4">
+                    <label for="">Fecha:</label>&nbsp;<span>{{itemEdit.date | date:'dd/MM/yyyy HH:mm'}}</span>
+                </div>
+                <div class="col-md-4">
+                    <label for="">Generado por:</label>&nbsp;<span>{{itemEdit.create_user}}</span>
+                </div>
+                <div class="col-md-4">
+                    <label for="">Estado:</label>&nbsp;
+                    <span style="font-size:0.8rem" class="badge text-wrap text-uppercase" [ngClass]="{'badge-primary': (itemEdit.state!='borrador'), 'badge-danger': (itemEdit.state=='borrador')}">{{ itemEdit.state }}</span>
+                </div>
+            </div>
+            <hr class="pb-2">
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field>
+                        <mat-label>Origen</mat-label>
+                        <select matNativeControl formControlName="other_data">
+                            <option [ngValue]="''" [disabled]="true" >Seleccionar Origen</option>
+                            <option [value]="item.value" *ngFor="let item of dataOrigen;" style="margin-left:10px;">{{ item.value }}</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="issue" type="text" placeholder="Asunto" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="sender" type="text" placeholder="Remitente" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="area" type="text" placeholder="Area Distribución" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="doc_type" type="text" placeholder="Tipo de Documento" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field class="mx-2">
+                        <input matInput formControlName="reference" type="text" placeholder="Referencia" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-form-field class="mx-2">
+                        <textarea matInput formControlName="observations" type="text" placeholder="Observaciones" autocomplete="off"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+            <p class="pl-2">
+                <label for="" class="text-muted" style="font-size: 0.7rem;">
+                    <i class="fa fa-file-archive" style="color: #318cd2;"></i> 
+                    Documento Disponible:
+                </label>
+                <span *ngIf="itemEdit.images==''" style="font-size: 0.75rem;color: red;" class="text-muted">&nbsp;<i class="fa fa-ban" style="color:red"></i>&nbsp;NINGUNO</span>
+                <a *ngIf="itemEdit.images!=''" [href]="url + 'docs-register/get-document/'+ itemEdit.images_path" target="_blank" class="btn btn-link" style="color: #318cd2;"><u>{{itemEdit.images}}</u></a>
+            </p>
+            <hr>
+            <p>
+                <label for="" class="text-muted" style="font-size: 0.7rem;">CAMBIAR DOCUMENTO</label>
+                <input #fileInputEdit [disabled]="formEdit.disabled" class="btn btn-success btn-sm btn-block" type="file" placeholder="Seleccionar archivo..." (change)="fileChangeEvent($event)">
+            </p>
+        </div>
+        <p-footer class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="displayEdit=false">Cancelar</button>
+            <button (click)="handleSendMail(itemEdit)" type="button" class="btn btn-info btn-sm">
+                <i class="far fa-envelope"></i> Enviar Email
+            </button>
+            <button *ngIf="itemEdit.state == 'borrador'" (click)="approveDocRegister()" type="button" class="btn btn-success btn-sm">
+                <i class="fa fa-key"></i> Autorizar
+            </button>
+            <button [disabled]="!formEdit.valid" type="submit" class="btn btn-primary btn-sm">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </p-footer>
+    </form>
+</p-dialog>
+
+<!-- ENVIAR CORREO -->
+<p-dialog [(visible)]="displaySendEmail" positionTop="50" [contentStyle]="{'max-width':'65rem', 'min-width': '60rem'}" modal="true">
+    <p-header>
+        Enviar Correo
+    </p-header>
+    <form [formGroup]="formEmail" style="margin-bottom:0px" (ngSubmit)="SendMail()">
+        <div style="padding:5px">
+            <div class="row">
+                <div class="col-md-3 d-flex justify-content-center align-items-center">
+                    <button class="btn btn-outline-primary" [disabled]="!formEmail.valid" type="submit">
+                        <i class="far fa-envelope fa-4x"></i><br>
+                        Enviar
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Para" formControlName="to">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="CC" formControlName="cc">
+                    </mat-form-field>
+                    <mat-form-field class="mx-2">
+                        <input matInput placeholder="Asunto" formControlName="subject">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-auto">
+            <div class="card">
+                <label for="">Mensaje</label>
+                <div class="card-body">
+                    <div [innerHtml]="formEmail.value.html | safeHtml"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</p-dialog>
