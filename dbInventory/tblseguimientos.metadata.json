@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"11d7cab6023f4f4fb60f6e37ae756a02","collectionName":"tblseguimientos","type":"collection"}
